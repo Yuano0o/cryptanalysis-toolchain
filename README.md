@@ -60,6 +60,27 @@ candidate space
   → verified result
 ```
 
+## Current Update — SAT Baseline B1
+
+The first static baseline checkpoint is complete. It maps the four-round
+GIFT-64 differential program from the Improved Attacks reference source without
+yet compiling or invoking a solver.
+
+- fixed instance: 4 rounds, integral weight bound `<= 11`, decimal-component
+  bound `<= 1`;
+- recovered size: 2,740 Boolean variables and 8,091 clauses;
+- independently checked the encoded S-box transition/weight table against the
+  GIFT DDT, with no semantic mismatches;
+- documented the permutation direction, model decoding and the need for an
+  explicit `SAT` / `UNSAT` / `UNKNOWN` result contract.
+
+This is an infrastructure and regression baseline, not a reproduction of the
+full Improved Attacks paper. The next checkpoint is B2: versioned configuration
+plus shared `SolverRequest` and `SolverResult` schemas. See
+[`docs/current_analysis/sat_baseline.md`](docs/current_analysis/sat_baseline.md)
+and
+[`docs/current_analysis/sat_baseline_static_map.md`](docs/current_analysis/sat_baseline_static_map.md).
+
 ## Planned Evaluation
 
 | Cipher | Role |
