@@ -60,9 +60,9 @@ candidate space
   → verified result
 ```
 
-## Current Update — SAT Baseline B1
+## Current Update — SAT Baseline B1-B2
 
-The first static baseline checkpoint is complete. It maps the four-round
+The first two static baseline checkpoints are complete. B1 maps the four-round
 GIFT-64 differential program from the Improved Attacks reference source without
 yet compiling or invoking a solver.
 
@@ -74,12 +74,19 @@ yet compiling or invoking a solver.
 - documented the permutation direction, model decoding and the need for an
   explicit `SAT` / `UNSAT` / `UNKNOWN` result contract.
 
+B2 adds strict, versioned `SolverRequest` and `SolverResult` contracts plus a
+machine-independent GIFT-64 request configuration. The request preserves the
+integer and `0.415` weight components separately, records the B1 static counts,
+and remains explicitly not execution-ready while the CNF, variable map and
+exact CryptoMiniSat version are unavailable. Contract validation also prevents
+timeouts or unverified results from becoming exact ML labels.
+
 This is an infrastructure and regression baseline, not a reproduction of the
-full Improved Attacks paper. The next checkpoint is B2: versioned configuration
-plus shared `SolverRequest` and `SolverResult` schemas. See
+full Improved Attacks paper. The next checkpoint is B3: an independent GIFT-64
+trail verifier. See
 [`docs/current_analysis/sat_baseline.md`](docs/current_analysis/sat_baseline.md)
 and
-[`docs/current_analysis/sat_baseline_static_map.md`](docs/current_analysis/sat_baseline_static_map.md).
+[`docs/current_analysis/sat_baseline_b2.md`](docs/current_analysis/sat_baseline_b2.md).
 
 ## Planned Evaluation
 

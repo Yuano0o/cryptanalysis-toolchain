@@ -1,6 +1,6 @@
 # Materials and Dependency Status
 
-> Last updated: 2026-07-25
+> Last updated: 2026-07-26
 >
 > Status vocabulary:
 >
@@ -15,6 +15,7 @@
 The current workspace is sufficient to start:
 
 - the GIFT-64 four-round SAT baseline specification and static adapter work;
+- independent GIFT-64 verifier implementation using the completed B2 contract;
 - GIFT `TrailInformation.out` schema recovery;
 - LC/LNC contract design;
 - small parser and verifier fixtures that do not invoke a solver.
@@ -30,6 +31,7 @@ GIFT differential-level paper.
 | Accelerating source | available | `../upstream/Accelerating_Automatic_Search/` | Legacy CaDiCaL baseline | Keep read-only |
 | Improved Attacks paper | available | `../papers/gift64-improved-attacks/01_improved_attacks_gift64.pdf` | Historical GIFT search/attack targets | None |
 | Improved Attacks source archive | partial | `../upstream/_archives/Improved_Attacks_GIFT64-main.zip`; extracted read-only source in `../upstream/Improved_Attacks_GIFT64/` | First GIFT SAT baseline | Use only as two small search references |
+| Versioned solver contracts | available | `src/shared/sat/contracts.py`; GIFT request under `experiments/gift64/` | Shared exact boundary for both workstreams | Extend only when a concrete stage requires new fields |
 | C++ compiler | available | `/usr/bin/clang++`, `/usr/bin/g++` | Native adapter/baseline compilation | None |
 | CryptoMiniSat 5 executable/API | missing-blocking | Not found in PATH, pkg-config, `/usr/local/include` or `/opt/homebrew/include` | Compile and run GIFT/Improved C++ SAT code | Install or provide approved environment later |
 | CaDiCaL | missing-nonblocking | Not found in PATH | Execute Accelerating Python scripts | Defer until CaDiCaL baseline is selected |

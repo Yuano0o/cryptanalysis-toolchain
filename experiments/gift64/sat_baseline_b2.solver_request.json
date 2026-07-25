@@ -1,0 +1,65 @@
+{
+  "assumptions": [],
+  "cipher": {
+    "analysis_kind": "single_key_differential",
+    "bit_order_id": "gift64_reference_bit_index_v1",
+    "name": "GIFT-64",
+    "nibble_order_id": "gift64_reference_nibble_index_v1",
+    "round_count": 4,
+    "round_end": 4,
+    "round_start": 0,
+    "state_layout_id": "gift64_reference_state_v1",
+    "variant": "reference"
+  },
+  "encoding_version": "improved-attacks-gift64-differential-cpp/92b12fd9c65f5870",
+  "expected_static_counts": {
+    "clauses": 8091,
+    "solver_calls": 1,
+    "variables": 2740
+  },
+  "fixed_differences": {
+    "input": null,
+    "key": null,
+    "output": null
+  },
+  "instance": null,
+  "objective": {
+    "combination": "componentwise",
+    "comparison": "<=",
+    "components": [
+      {
+        "bound": 11,
+        "name": "integral_weight",
+        "unit": "1"
+      },
+      {
+        "bound": 1,
+        "name": "decimal_weight_count",
+        "unit": "0.415"
+      }
+    ],
+    "kind": "split_probability_weight"
+  },
+  "problem_kind": "differential_characteristic",
+  "request_id": "gift64-improved-attacks-differential-r4-w11-d1",
+  "resources": {
+    "memory_limit_mb": null,
+    "time_limit_s": null
+  },
+  "schema_version": "solver-request/v1",
+  "seed": 0,
+  "solver": {
+    "name": "cryptominisat",
+    "options": {},
+    "threads": 1,
+    "version": null
+  },
+  "source": {
+    "archive_sha256": "0c08cc325e1e857e5e5a0015e1d5e30cd550aaf19ef8a6b10e9d19596008f52d",
+    "entry_point": "Differential.cpp",
+    "repository": "../upstream/Improved_Attacks_GIFT64",
+    "revision": "0dff1caf65675de6ab0aa7edf0f51883a576eacc",
+    "source_sha256": "92b12fd9c65f5870c8f43b0b2e824c4afe789436290cc22e49d238362440c25c"
+  },
+  "variable_map": null
+}

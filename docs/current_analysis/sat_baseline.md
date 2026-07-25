@@ -1,6 +1,6 @@
 # SAT Baseline: GIFT-64 Four-Round Differential Search
 
-> Last updated: 2026-07-25
+> Last updated: 2026-07-26
 >
 > This is an exact baseline and regression boundary, not a claim of reproducing
 > the full *Improved Attacks on GIFT-64* paper.
@@ -140,22 +140,38 @@ comparable performance baselines without rerunning the same instance.
 |---|---|---|
 | B0 Source/paper inspection | complete | Encoding purpose and coverage limits documented |
 | B1 Static variable/constraint map | complete | Variables, clauses, DDT/weight semantics, permutation and output mapped |
-| B2 Versioned config/contracts | next | Request/result can be represented without solver execution |
-| B3 Independent verifier | not-started | Hand-constructed or source-derived trail can be checked |
+| B2 Versioned config/contracts | complete | Request/result can be represented and validated without solver execution |
+| B3 Independent verifier | next | Hand-constructed or source-derived trail can be checked |
 | B4 Compile and smoke solve | blocked | CryptoMiniSat environment approved and available |
 | B5 Decode and validate | blocked | SAT model independently passes all checks |
 | B6 Regression capture | blocked | Stable validated summary recorded |
 | B7 Controlled comparison | deferred | At least one alternative configuration compared fairly |
 
+## B2 result
+
+Implemented:
+
+- `experiments/gift64/sat_baseline_b2.solver_request.json`;
+- strict standard-library contracts in `src/shared/sat/contracts.py`;
+- deterministic JSON serialization and strict unknown-field rejection;
+- static expectations of 2740 variables, 8091 clauses and one solver call;
+- separate integral-weight and `0.415` decimal-component bounds;
+- explicit `SAT`, `UNSAT`, `UNKNOWN`, `TIMEOUT` and `ERROR` result semantics;
+- independent-verification gating for exact ML labels.
+
+The request is valid but intentionally not execution-ready: `instance`,
+`variable_map` and the exact solver version are null until later checkpoints
+produce or approve them.
+
 ## Immediate next implementation
 
-Proceed with B2:
+Proceed with B3:
 
-1. create a versioned, machine-independent baseline configuration;
-2. define the minimal `SolverRequest` and `SolverResult` data contracts;
-3. record expected static counts: 2740 variables and 8091 clauses;
-4. preserve separate integral and decimal weight fields;
-5. keep solver execution optional until CryptoMiniSat is approved.
+1. define the decoded four-round trail representation required by the verifier;
+2. independently check every GIFT S-box transition and round permutation;
+3. recompute integral and decimal weight components;
+4. reject a zero input difference and malformed state layouts;
+5. keep the verifier independent of CryptoMiniSat and upstream execution.
 
-This checkpoint requires no solver and no new external material. The completed
-B1 evidence is in [sat_baseline_static_map.md](sat_baseline_static_map.md).
+B3 requires no solver and no new external material. B2 details are in
+[sat_baseline_b2.md](sat_baseline_b2.md).

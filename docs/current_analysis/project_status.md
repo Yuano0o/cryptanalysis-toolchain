@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-25
+> Last updated: 2026-07-26
 >
 > Status vocabulary: `complete`, `complete-draft`, `in-progress`, `ready`,
 > `ready-for-static-work`, `blocked`, `not-started`, `deferred`.
@@ -11,8 +11,8 @@
 |---|---|---|
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
-| Stage-contract schema design | complete-draft | Required fields documented; no implementation yet |
-| SAT baseline | in-progress | Target selected and execution specification created; solver unavailable |
+| Stage-contract schema design | in-progress | `SolverRequest`/`SolverResult` implemented; trail and later-stage contracts remain drafts |
+| SAT baseline | in-progress | B0-B2 complete; independent verifier is next and solver execution remains blocked |
 | Workstream A pipeline implementation | not-started | Source map exists; parser/adapter code not created |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
@@ -29,9 +29,9 @@ Current checkpoint:
 1. Source and paper relationship inspected - complete.
 2. Baseline target and acceptance criteria - complete.
 3. Static source-to-contract mapping - complete.
-4. Research-side configuration/contracts - next.
+4. Research-side configuration/contracts - complete.
 5. Compile/solve - blocked by missing CryptoMiniSat 5.
-6. Independent trail validation - not started.
+6. Independent trail validation - next.
 7. Regression fixture - not started.
 
 ## Workstream A: Automated Differential-Level Analysis Pipeline
@@ -39,8 +39,8 @@ Current checkpoint:
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
-| Common artifact contracts | complete-draft | Envelope, solver, trail, constraints, key space and probability fields specified | Turn first three into versioned research-side definitions | Representation choices need validation |
-| SAT trail search boundary | in-progress | Static variable/clause/DDT/weight/permutation map complete | Versioned config and request/result contracts | CryptoMiniSat blocks execution only |
+| Common artifact contracts | in-progress | Strict versioned solver request/result contracts implemented; later-stage fields remain specified drafts | Add `TrailRecord` only with the B3 verifier boundary | Later representation choices need validation |
+| SAT trail search boundary | in-progress | B1 static map and B2 machine-independent request/result contracts complete | Implement independent four-round trail verifier | CryptoMiniSat blocks execution only |
 | `TrailInformation.out` parser | ready | Inputs available | Recover exact token boundaries and ordering | None |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
@@ -55,7 +55,7 @@ Current checkpoint:
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Prior-work review | complete | NeuroSAT/NeuroGIFT tasks and limitations recorded | Keep as design constraints | None |
-| Exact label contract | ready | `SolverResult` fields specified | Implement only after exact baseline | Solver environment |
+| Exact label contract | complete | `SolverResult` rejects non-definitive or independently unverified exact labels | Exercise with real results after B5 | Solver environment blocks data, not the contract |
 | BAKSHEESH cipher boundary | ready | Encryption source and paper oracles identified | Document/test ordering and vector | None for static work |
 | BAKSHEESH exact search | blocked | Original search code absent | Request or independently rebuild later | Missing original encoding/search |
 | Runtime prediction baseline | not-started | Recommended first ML task | Define after solver telemetry exists | No controlled runtime dataset |
@@ -73,11 +73,9 @@ Current checkpoint:
 
 ## Immediate next actions
 
-1. Define the baseline's research-side config and `SolverRequest`/`SolverResult`
-   instance without invoking a solver.
-2. Define an independent verifier for a decoded four-round trail.
-3. Request approval before installing or connecting CryptoMiniSat 5.
-4. In parallel, begin `TrailInformation.out` schema recovery because it has no
+1. Define an independent verifier for a decoded four-round trail.
+2. Request approval before installing or connecting CryptoMiniSat 5.
+3. In parallel, begin `TrailInformation.out` schema recovery because it has no
    dependency blocker.
 
 ## Change log
@@ -86,3 +84,6 @@ Current checkpoint:
   implementation.
 - 2026-07-25: completed baseline B1 static mapping, including source hashes,
   2740-variable/8091-clause counts and a full DDT/weight semantic check.
+- 2026-07-26: completed baseline B2 with a versioned GIFT-64 request,
+  strict `SolverRequest`/`SolverResult` contracts and deterministic contract
+  tests; no solver was installed or invoked.

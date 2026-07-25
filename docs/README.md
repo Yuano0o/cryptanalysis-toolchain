@@ -22,6 +22,9 @@ These files reflect the latest full workspace and paper scan:
 - [sat_baseline_static_map.md](current_analysis/sat_baseline_static_map.md):
   source hashes, variable/clause counts, DDT/weight check, permutation
   direction and model decoding for baseline checkpoint B1.
+- [sat_baseline_b2.md](current_analysis/sat_baseline_b2.md): implemented
+  request/result contracts, configuration semantics, invariants and tests for
+  checkpoint B2.
 
 ### Prior planning
 
