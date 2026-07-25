@@ -15,7 +15,7 @@
 The current workspace is sufficient to start:
 
 - the GIFT-64 four-round SAT baseline specification and static adapter work;
-- independent GIFT-64 verifier implementation using the completed B2 contract;
+- use of the completed independent GIFT-64 verifier on hand-constructed trails;
 - GIFT `TrailInformation.out` schema recovery;
 - LC/LNC contract design;
 - small parser and verifier fixtures that do not invoke a solver.
@@ -32,10 +32,11 @@ GIFT differential-level paper.
 | Improved Attacks paper | available | `../papers/gift64-improved-attacks/01_improved_attacks_gift64.pdf` | Historical GIFT search/attack targets | None |
 | Improved Attacks source archive | partial | `../upstream/_archives/Improved_Attacks_GIFT64-main.zip`; extracted read-only source in `../upstream/Improved_Attacks_GIFT64/` | First GIFT SAT baseline | Use only as two small search references |
 | Versioned solver contracts | available | `src/shared/sat/contracts.py`; GIFT request under `experiments/gift64/` | Shared exact boundary for both workstreams | Extend only when a concrete stage requires new fields |
+| Independent GIFT-64 verifier | available | `src/shared/ciphers/gift64.py`; structural and negative tests | Validate decoded four-round trails without solver trust | Controlled model decoding remains B5 work |
 | C++ compiler | available | `/usr/bin/clang++`, `/usr/bin/g++` | Native adapter/baseline compilation | None |
-| CryptoMiniSat 5 executable/API | missing-blocking | Not found in PATH, pkg-config, `/usr/local/include` or `/opt/homebrew/include` | Compile and run GIFT/Improved C++ SAT code | Install or provide approved environment later |
+| CryptoMiniSat 5 executable/API | available | Homebrew CryptoMiniSat `5.14.7`; GMP `6.3.0` | Compile and run GIFT/Improved C++ SAT code | C++17 and explicit Homebrew include/lib prefixes required |
 | CaDiCaL | missing-nonblocking | Not found in PATH | Execute Accelerating Python scripts | Defer until CaDiCaL baseline is selected |
-| Exact solver version used by each paper | partial | Papers identify solver families, not a complete reproducible environment | Fair runtime/result comparison | Record chosen version and treat historical runtime as non-comparable |
+| Exact solver version used by each paper | partial | Papers identify solver families; local baseline now records CryptoMiniSat `5.14.7` | Fair runtime/result comparison | Treat historical runtime as non-comparable |
 | Expected output for four-round Improved differential search | missing-nonblocking | Archive contains no result file | Regression oracle | Produce only after first exact solve and independent validation |
 
 ## Workstream A: GIFT differential-level pipeline

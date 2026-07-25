@@ -63,11 +63,10 @@ The first baseline will not:
 - encoding constants and fixed search configuration;
 - research-side schema draft.
 
-### Missing for execution
+### Missing for controlled execution
 
-- CryptoMiniSat 5 headers/library or an approved equivalent execution
-  environment;
-- a first exact solver result;
+- an owned adapter that exposes every solver status explicitly;
+- a versioned model/result artifact boundary;
 - an independently validated expected trail.
 
 No additional paper or source file is required to begin static implementation.
@@ -141,9 +140,9 @@ comparable performance baselines without rerunning the same instance.
 | B0 Source/paper inspection | complete | Encoding purpose and coverage limits documented |
 | B1 Static variable/constraint map | complete | Variables, clauses, DDT/weight semantics, permutation and output mapped |
 | B2 Versioned config/contracts | complete | Request/result can be represented and validated without solver execution |
-| B3 Independent verifier | next | Hand-constructed or source-derived trail can be checked |
-| B4 Compile and smoke solve | blocked | CryptoMiniSat environment approved and available |
-| B5 Decode and validate | blocked | SAT model independently passes all checks |
+| B3 Independent verifier | complete | Hand-constructed trail and targeted invalid cases are checked independently |
+| B4 Compile and smoke solve | complete | CryptoMiniSat 5.14.7 compiled and ran the unchanged legacy source |
+| B5 Decode and validate | next | Controlled SAT model independently passes all checks |
 | B6 Regression capture | blocked | Stable validated summary recorded |
 | B7 Controlled comparison | deferred | At least one alternative configuration compared fairly |
 
@@ -159,19 +158,43 @@ Implemented:
 - explicit `SAT`, `UNSAT`, `UNKNOWN`, `TIMEOUT` and `ERROR` result semantics;
 - independent-verification gating for exact ML labels.
 
-The request is valid but intentionally not execution-ready: `instance`,
-`variable_map` and the exact solver version are null until later checkpoints
-produce or approve them.
+The request is valid but intentionally not execution-ready: `instance` and
+`variable_map` remain null. B4 records the selected solver version as
+CryptoMiniSat `5.14.7`.
+
+## B3 result
+
+Implemented:
+
+- minimal versioned `TrailRecord`/`TrailRound` representation;
+- GIFT DDT generation from the S-box rather than the upstream SAT restriction
+  table;
+- independent permutation-direction and round-continuity checks;
+- exact recomputation of integral weight and `0.415` component count;
+- rejection of invalid transitions, zero input, malformed states and false
+  claimed weights;
+- conversion to the B2 independent-verification result.
+
+The fixed positive fixture is a structurally valid four-round trail with
+recomputed components `33` and `4`. It intentionally does not satisfy the B2
+bounds `11` and `1`; no bound-satisfying solver result is claimed.
+
+## B4 result
+
+CryptoMiniSat `5.14.7` and GMP `6.3.0` were installed through Homebrew. The
+unchanged upstream source compiled out of tree with Apple clang `14.0.3` and
+C++17, then completed one short legacy smoke solve. It printed four round-state
+blocks and returned exit code `0`; generated output and binaries were not
+tracked.
+
+This does not yet satisfy the controlled result contract because the upstream
+program prints no explicit solver status and cannot distinguish `UNSAT` from
+`UNKNOWN` at its process boundary.
 
 ## Immediate next implementation
 
-Proceed with B3:
+B5 should add a narrow owned status/decode adapter, map the observed model into
+`TrailRecord`, verify it independently and emit a versioned `SolverResult`.
 
-1. define the decoded four-round trail representation required by the verifier;
-2. independently check every GIFT S-box transition and round permutation;
-3. recompute integral and decimal weight components;
-4. reject a zero input difference and malformed state layouts;
-5. keep the verifier independent of CryptoMiniSat and upstream execution.
-
-B3 requires no solver and no new external material. B2 details are in
-[sat_baseline_b2.md](sat_baseline_b2.md).
+B3 and B4 details are in [sat_baseline_b3.md](sat_baseline_b3.md) and
+[sat_baseline_b4.md](sat_baseline_b4.md).

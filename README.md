@@ -60,9 +60,9 @@ candidate space
   → verified result
 ```
 
-## Current Update — SAT Baseline B1-B2
+## Current Update — SAT Baseline B1-B4
 
-The first two static baseline checkpoints are complete. B1 maps the four-round
+The first four baseline checkpoints are complete. B1 maps the four-round
 GIFT-64 differential program from the Improved Attacks reference source without
 yet compiling or invoking a solver.
 
@@ -77,16 +77,27 @@ yet compiling or invoking a solver.
 B2 adds strict, versioned `SolverRequest` and `SolverResult` contracts plus a
 machine-independent GIFT-64 request configuration. The request preserves the
 integer and `0.415` weight components separately, records the B1 static counts,
-and remains explicitly not execution-ready while the CNF, variable map and
-exact CryptoMiniSat version are unavailable. Contract validation also prevents
-timeouts or unverified results from becoming exact ML labels.
+and remains explicitly not execution-ready while the CNF and variable map are
+unavailable. Contract validation also prevents timeouts or unverified results
+from becoming exact ML labels.
+
+B3 adds an independent four-round GIFT-64 trail verifier. It rebuilds the DDT
+from the published S-box, checks the permutation direction and round
+continuity, rejects malformed/zero-input trails, and recomputes both weight
+components. Its fixed structural fixture is deliberately outside the B2 bounds;
+it tests the verifier and is not presented as a baseline SAT solution.
+
+B4 records CryptoMiniSat 5.14.7, compiles the unchanged upstream source out of
+tree with C++17, and completes one short four-round legacy smoke solve. Build
+artifacts and raw solver output are not tracked. Because the legacy program
+does not explicitly distinguish all solver statuses, controlled result
+decoding and independent validation remain B5 work.
 
 This is an infrastructure and regression baseline, not a reproduction of the
-full Improved Attacks paper. The next checkpoint is B3: an independent GIFT-64
-trail verifier. See
+full Improved Attacks paper. See
 [`docs/current_analysis/sat_baseline.md`](docs/current_analysis/sat_baseline.md)
 and
-[`docs/current_analysis/sat_baseline_b2.md`](docs/current_analysis/sat_baseline_b2.md).
+[`docs/current_analysis/sat_baseline_b4.md`](docs/current_analysis/sat_baseline_b4.md).
 
 ## Planned Evaluation
 

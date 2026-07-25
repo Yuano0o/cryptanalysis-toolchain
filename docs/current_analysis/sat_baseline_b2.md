@@ -42,9 +42,10 @@ The GIFT configuration preserves the upstream source's two independent bounds:
 
 The two fields are not collapsed into a rounded floating-point total.
 
-The B2 request is representable but not execution-ready. Its `instance`,
-`variable_map` and exact CryptoMiniSat version are null because those artifacts
-and environment facts do not yet exist.
+The B2 request is representable but not execution-ready. Its `instance` and
+`variable_map` are null because those artifacts do not yet exist. B4 later
+recorded the selected CryptoMiniSat version as `5.14.7`; the missing artifacts
+still keep the request from being execution-ready.
 
 ## Result semantics
 
@@ -90,7 +91,10 @@ Run:
 PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-## Next boundary
+## Subsequent boundary
 
-B3 should add only the trail representation needed for an independent
-four-round GIFT verifier. Solver installation remains deferred until B4.
+B3 subsequently added only the trail representation needed for an independent
+four-round GIFT verifier. B4 then installed CryptoMiniSat, compiled the legacy
+source out of tree and completed a short smoke solve. See
+[sat_baseline_b3.md](sat_baseline_b3.md) and
+[sat_baseline_b4.md](sat_baseline_b4.md).

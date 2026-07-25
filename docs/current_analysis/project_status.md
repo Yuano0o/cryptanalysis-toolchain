@@ -11,8 +11,8 @@
 |---|---|---|
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
-| Stage-contract schema design | in-progress | `SolverRequest`/`SolverResult` implemented; trail and later-stage contracts remain drafts |
-| SAT baseline | in-progress | B0-B2 complete; independent verifier is next and solver execution remains blocked |
+| Stage-contract schema design | in-progress | Solver contracts and minimal `TrailRecord` implemented; later-stage contracts remain drafts |
+| SAT baseline | in-progress | B0-B4 complete; controlled decode/validation is next at B5 |
 | Workstream A pipeline implementation | not-started | Source map exists; parser/adapter code not created |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
@@ -30,17 +30,18 @@ Current checkpoint:
 2. Baseline target and acceptance criteria - complete.
 3. Static source-to-contract mapping - complete.
 4. Research-side configuration/contracts - complete.
-5. Compile/solve - blocked by missing CryptoMiniSat 5.
-6. Independent trail validation - next.
-7. Regression fixture - not started.
+5. Compile/legacy smoke solve - complete with CryptoMiniSat 5.14.7.
+6. Independent verifier implementation - complete.
+7. Controlled decoding and validation of a real solver model - next at B5.
+8. Regression fixture - not started.
 
 ## Workstream A: Automated Differential-Level Analysis Pipeline
 
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
-| Common artifact contracts | in-progress | Strict versioned solver request/result contracts implemented; later-stage fields remain specified drafts | Add `TrailRecord` only with the B3 verifier boundary | Later representation choices need validation |
-| SAT trail search boundary | in-progress | B1 static map and B2 machine-independent request/result contracts complete | Implement independent four-round trail verifier | CryptoMiniSat blocks execution only |
+| Common artifact contracts | in-progress | Solver contracts and minimal versioned `TrailRecord` implemented; later-stage fields remain specified drafts | Extend `TrailRecord` only when parser/model decoding requires it | Later representation choices need validation |
+| SAT trail search boundary | in-progress | B1 map, B2 contracts, B3 verifier and B4 legacy smoke solve complete | Add explicit status/decode/verification adapter at B5 | Legacy source conflates non-SAT statuses |
 | `TrailInformation.out` parser | ready | Inputs available | Recover exact token boundaries and ordering | None |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
@@ -73,9 +74,9 @@ Current checkpoint:
 
 ## Immediate next actions
 
-1. Define an independent verifier for a decoded four-round trail.
-2. Request approval before installing or connecting CryptoMiniSat 5.
-3. In parallel, begin `TrailInformation.out` schema recovery because it has no
+1. Implement the narrow B5 controlled adapter and validate a decoded model
+   against the independent verifier.
+2. In parallel, begin `TrailInformation.out` schema recovery because it has no
    dependency blocker.
 
 ## Change log
@@ -87,3 +88,9 @@ Current checkpoint:
 - 2026-07-26: completed baseline B2 with a versioned GIFT-64 request,
   strict `SolverRequest`/`SolverResult` contracts and deterministic contract
   tests; no solver was installed or invoked.
+- 2026-07-26: completed baseline B3 with a minimal `TrailRecord`, independently
+  generated GIFT DDT, permutation/continuity checks and split-weight
+  recomputation; the test fixture is structural, not a baseline solver result.
+- 2026-07-26: installed CryptoMiniSat 5.14.7 and completed B4 by compiling the
+  unchanged upstream source out of tree with C++17 and running one short legacy
+  smoke solve; no generated artifacts were tracked.

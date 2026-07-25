@@ -191,5 +191,5 @@ Checkpoint B1 is complete:
 - weight semantics checked;
 - permutation direction and stdout decoding mapped.
 
-Next checkpoint: B2, versioned research-side configuration and
-`SolverRequest`/`SolverResult` contracts.
+Follow-up: B2 versioned contracts and the B3 independent verifier are now
+complete. Solver-backed execution begins only at B4.

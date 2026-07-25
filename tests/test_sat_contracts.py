@@ -49,7 +49,7 @@ class SolverRequestTests(unittest.TestCase):
 
         self.assertIsNone(request.instance)
         self.assertIsNone(request.variable_map)
-        self.assertIsNone(request.solver.version)
+        self.assertEqual(request.solver.version, "5.14.7")
         self.assertFalse(request.execution_ready)
 
     def test_request_round_trip_is_deterministic(self) -> None:

@@ -25,6 +25,12 @@ These files reflect the latest full workspace and paper scan:
 - [sat_baseline_b2.md](current_analysis/sat_baseline_b2.md): implemented
   request/result contracts, configuration semantics, invariants and tests for
   checkpoint B2.
+- [sat_baseline_b3.md](current_analysis/sat_baseline_b3.md): independent
+  GIFT-64 DDT, permutation, continuity and split-weight verification for
+  checkpoint B3.
+- [sat_baseline_b4.md](current_analysis/sat_baseline_b4.md): CryptoMiniSat
+  environment, out-of-tree compile and short legacy smoke-solve evidence for
+  checkpoint B4.
 
 ### Prior planning
 

@@ -52,7 +52,7 @@
     "name": "cryptominisat",
     "options": {},
     "threads": 1,
-    "version": null
+    "version": "5.14.7"
   },
   "source": {
     "archive_sha256": "0c08cc325e1e857e5e5a0015e1d5e30cd550aaf19ef8a6b10e9d19596008f52d",
