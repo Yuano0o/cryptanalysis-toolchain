@@ -80,14 +80,7 @@ benchmarks/     benchmark definitions and test vectors
 configs/        reproducible configurations
 experiments/    experiment definitions for each evaluation cipher
 tests/          unit, integration, and regression tests
-docs/           project documentation, paper mapping, and roadmap
 ```
 
 The public reference repositories remain unchanged and are accessed through
 adapters rather than copied into this repository.
-
-## Documentation
-
-- [Project overview](docs/project_overview.md)
-- [Repository–paper map](docs/repo_paper_map.md)
-- [Research roadmap](docs/research_roadmap.md)
