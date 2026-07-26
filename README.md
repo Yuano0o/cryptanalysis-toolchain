@@ -87,9 +87,9 @@ maintenance items, blockers and the next action.
 
 ## Current Update — GIFT-64 Pipeline A1-A5
 
-The active milestone is a controlled, reviewable GIFT-64 differential-analysis
-pipeline demo. A1-A5 now expose the supplied artifacts and legacy programs
-through explicit, versioned boundaries:
+The completed milestone is a controlled, reviewable GIFT-64
+differential-analysis pipeline demo. A1-A5 expose the supplied artifacts and
+legacy programs through explicit, versioned boundaries:
 
 | Part | Current result | Details |
 |---|---|---|
@@ -106,10 +106,11 @@ boundary orchestration, not a strict A4-to-A5 artifact data flow or paper
 reproduction; the missing original `KeyCandidate.out`, trail-generation
 provenance and proof-producing `UNSAT` workflow remain material limits.
 
-**Next step:** review the seven-item integrated-demo acceptance boundary, then
-recover the coexistence-matrix semantics. See
-[project status](docs/current_analysis/project_status.md) for the acceptance
-tracker and [materials status](docs/current_analysis/materials_status.md) for
+The seven-item integrated-demo acceptance is complete. **Next step:** recover
+the coexistence-matrix semantics. See
+[project status](docs/current_analysis/project_status.md) for the completed
+acceptance tracker and
+[materials status](docs/current_analysis/materials_status.md) for
 paper-reproduction blockers.
 
 ## Planned Evaluation
