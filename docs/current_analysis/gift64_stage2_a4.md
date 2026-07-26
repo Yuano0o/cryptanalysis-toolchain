@@ -112,9 +112,17 @@ number generator and gives every run a corpus SHA-256.
 
 The key-corpus contract rejects a non-demo purpose, unsupported generator,
 missing final newline, blank records, malformed words and count mismatches.
+It also caps a standalone demo request at 100,000 keys, so key generation and
+canonical corpus hashing cannot allocate an unbounded request before the run
+budget is checked.
 Its purpose is permanently `generated-for-demo`; its hash records the exact
 sample that was queried, but does not make it comparable to the missing author
 sample.
+
+The adapter separately distinguishes its 60-second compile guard from the
+request total budget. A compile-guard timeout is a stage failure; only a
+timeout caused by the shorter remaining total budget may mark all keys
+`not_started_total_budget`.
 
 ## Acceptance evidence
 
@@ -153,10 +161,10 @@ Do not state that A4:
 - establishes a complete right-key space, probability, key recovery or
   paper-level differential result.
 
-## Next boundary
+## Integration boundary
 
-A4 now has bounded smoke and formal-demo requests. The next integration step
-is one unified A1-A5 configuration and runner, followed by a small end-to-end
-regression and an automatically generated cross-stage summary. Any extension
-to more physical trail positions must retain the `generated-for-demo` label
-and declare its own total budget.
+A4 is included in the unified controlled orchestration. Its generated demo
+corpus is not asserted to be the source of A5's supplied
+`KeyCandidate1000.out`; that lineage remains unavailable. Any extension to
+more physical trail positions must retain the `generated-for-demo` label and
+declare its own total budget.

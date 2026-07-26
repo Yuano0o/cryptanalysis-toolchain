@@ -80,7 +80,8 @@ class Gift64Stage3AdapterError(ValueError):
 @dataclass(frozen=True)
 class Gift64Stage3SampleResult:
     sample_index: int
-    terminal_status: SolverStatus
+    execution_state: str
+    terminal_status: SolverStatus | None
     fixed_assignments: tuple[tuple[int, int], ...]
     solution_count: int | None
     wall_time_s: float
@@ -94,8 +95,31 @@ class Gift64Stage3SampleResult:
             raise Gift64Stage3AdapterError("sample_index must be an integer")
         if self.sample_index < 0:
             raise Gift64Stage3AdapterError("sample_index must be non-negative")
-        if not isinstance(self.terminal_status, SolverStatus):
-            raise Gift64Stage3AdapterError("terminal_status must be a SolverStatus")
+        if self.execution_state not in {"ran", "not_started_total_budget"}:
+            raise Gift64Stage3AdapterError("unsupported Stage 3 execution state")
+        if self.execution_state == "ran" and not isinstance(
+            self.terminal_status, SolverStatus
+        ):
+            raise Gift64Stage3AdapterError(
+                "ran sample must carry a terminal SolverStatus"
+            )
+        if self.execution_state == "not_started_total_budget":
+            if self.terminal_status is not None:
+                raise Gift64Stage3AdapterError(
+                    "unstarted sample must not carry a terminal status"
+                )
+            if self.fixed_assignments or self.solution_count is not None:
+                raise Gift64Stage3AdapterError(
+                    "unstarted sample must not carry sampled assignments or counts"
+                )
+            if (
+                any((self.wall_time_s, self.cpu_time_s))
+                or self.exit_code is not None
+                or self.stdout_sha256 is not None
+            ):
+                raise Gift64Stage3AdapterError(
+                    "unstarted sample must not carry execution measurements"
+                )
         if self.solution_count is not None and (
             isinstance(self.solution_count, bool)
             or not isinstance(self.solution_count, int)
@@ -116,12 +140,20 @@ class Gift64Stage3SampleResult:
 
     @property
     def complete(self) -> bool:
-        return self.terminal_status is SolverStatus.UNSAT
+        return (
+            self.execution_state == "ran"
+            and self.terminal_status is SolverStatus.UNSAT
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "sample_index": self.sample_index,
-            "terminal_status": self.terminal_status.value,
+            "execution_state": self.execution_state,
+            "terminal_status": (
+                None
+                if self.terminal_status is None
+                else self.terminal_status.value
+            ),
             "complete": self.complete,
             "fixed_assignments": [
                 {"bit": bit, "value": value}
@@ -215,7 +247,10 @@ class Gift64Stage3Observation:
 
     def summary_dict(self) -> dict[str, Any]:
         status_counts = {
-            status.value: sum(item.terminal_status is status for item in self.samples)
+            status.value: sum(
+                item.execution_state == "ran" and item.terminal_status is status
+                for item in self.samples
+            )
             for status in SolverStatus
         }
         return {
@@ -232,6 +267,10 @@ class Gift64Stage3Observation:
             "run_wall_time_s": self.run_wall_time_s,
             "total_time_limit_s": self.request.total_time_limit_s,
             "status_counts": status_counts,
+            "not_started_total_budget_count": sum(
+                item.execution_state == "not_started_total_budget"
+                for item in self.samples
+            ),
             "estimate": None if self.estimate is None else self.estimate.to_dict(),
             "samples": [item.to_dict() for item in self.samples],
             "claim_boundary": (
@@ -401,26 +440,36 @@ def _formula_prefix(formula: str) -> Path:
     brew = shutil.which("brew")
     if brew is None:
         raise Gift64Stage3AdapterError("Homebrew is not available")
-    completed = subprocess.run(
-        [brew, "--prefix", formula],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
+    try:
+        completed = subprocess.run(
+            [brew, "--prefix", formula],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise Gift64Stage3AdapterError(
+            f"timed out resolving Homebrew prefix for {formula}"
+        ) from exc
     if completed.returncode != 0 or not completed.stdout.strip():
         raise Gift64Stage3AdapterError(f"cannot resolve Homebrew prefix for {formula}")
     return Path(completed.stdout.strip())
 
 
 def _installed_solver_version(cms_prefix: Path) -> str:
-    completed = subprocess.run(
-        [str(cms_prefix / "bin" / "cryptominisat5"), "--version"],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
+    try:
+        completed = subprocess.run(
+            [str(cms_prefix / "bin" / "cryptominisat5"), "--version"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise Gift64Stage3AdapterError(
+            "timed out determining installed CryptoMiniSat version"
+        ) from exc
     match = _SOLVER_VERSION_RE.search(completed.stdout + "\n" + completed.stderr)
     if completed.returncode != 0 or match is None:
         raise Gift64Stage3AdapterError("cannot determine installed CryptoMiniSat version")
@@ -461,6 +510,7 @@ def _run_one_sample(
     except subprocess.TimeoutExpired:
         return Gift64Stage3SampleResult(
             sample_index=sample_index,
+            execution_state="ran",
             terminal_status=SolverStatus.TIMEOUT,
             fixed_assignments=(),
             solution_count=None,
@@ -476,6 +526,7 @@ def _run_one_sample(
     if completed.returncode != 0:
         return Gift64Stage3SampleResult(
             sample_index=sample_index,
+            execution_state="ran",
             terminal_status=SolverStatus.ERROR,
             fixed_assignments=(),
             solution_count=None,
@@ -496,6 +547,7 @@ def _run_one_sample(
     except Gift64Stage3AdapterError as exc:
         return Gift64Stage3SampleResult(
             sample_index=sample_index,
+            execution_state="ran",
             terminal_status=SolverStatus.ERROR,
             fixed_assignments=(),
             solution_count=None,
@@ -508,6 +560,7 @@ def _run_one_sample(
     if terminal is SolverStatus.ERROR:
         return Gift64Stage3SampleResult(
             sample_index=sample_index,
+            execution_state="ran",
             terminal_status=terminal,
             fixed_assignments=assignments,
             solution_count=None,
@@ -522,6 +575,7 @@ def _run_one_sample(
         )
     return Gift64Stage3SampleResult(
         sample_index=sample_index,
+        execution_state="ran",
         terminal_status=terminal,
         fixed_assignments=assignments,
         solution_count=solution_count,
@@ -535,17 +589,22 @@ def _run_one_sample(
     )
 
 
-def _total_budget_timeout_result(sample_index: int) -> Gift64Stage3SampleResult:
+def _not_started_total_budget_result(
+    sample_index: int,
+) -> Gift64Stage3SampleResult:
     return Gift64Stage3SampleResult(
         sample_index=sample_index,
-        terminal_status=SolverStatus.TIMEOUT,
+        execution_state="not_started_total_budget",
+        terminal_status=None,
         fixed_assignments=(),
         solution_count=None,
         wall_time_s=0.0,
         cpu_time_s=0.0,
         exit_code=None,
         stdout_sha256=None,
-        diagnostics=("Stage 3 total run time budget was exhausted",),
+        diagnostics=(
+            "Stage 3 total run time budget was exhausted before launch",
+        ),
     )
 
 
@@ -642,7 +701,7 @@ def run_gift64_stage3_probability_demo(
             remaining = request.total_time_limit_s - (time.monotonic() - run_start)
             if remaining <= 0:
                 sample_results.extend(
-                    _total_budget_timeout_result(index)
+                    _not_started_total_budget_result(index)
                     for index in range(sample_index, request.repeat_count)
                 )
                 break

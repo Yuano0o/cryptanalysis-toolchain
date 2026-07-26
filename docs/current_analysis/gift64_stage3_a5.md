@@ -36,6 +36,7 @@ PYTHONPATH=src python3 scripts/run_gift64_stage3_probability_demo.py
 
 The command prints a JSON-compatible observation only. Generated stdout,
 per-sample assignments, binaries and result files are temporary and untracked.
+The observation schema is `gift64-stage3-probability-observation/v3`.
 
 ## What the legacy program actually does
 
@@ -98,6 +99,10 @@ the distinct target-input states for its selected subcube. `UNKNOWN`, process
 whole estimate unavailable rather than silently treating a partial count as
 exact.
 
+If the total budget expires before a later sample process starts, that sample
+is recorded as `execution_state: not_started_total_budget` with a null terminal
+status. It is reported separately and is not counted as a solver `TIMEOUT`.
+
 A5 emits the point estimate, sample minimum/maximum and sample standard
 deviation when at least two samples complete. It deliberately does **not** emit
 a confidence interval: deterministic pseudo-random subcubes and especially
@@ -147,9 +152,11 @@ Do not state that A5:
 - validates all 32 trail records, a producer `GroupIndex`, the full differential
   or a key-recovery claim.
 
-## Next boundary
+## Integration boundary
 
 For a stronger demo, extend the explicitly budgeted request across selected
 fixture-key positions and physical trail-record positions. Any aggregation must
 report its conditioning and assumptions rather than summing per-trail estimates
-as if they were automatically independent.
+as if they were automatically independent. The supplied fixture has no proven
+lineage from A4's generated demo corpus, so A5 remains an independently
+provenanced boundary inside the unified orchestration.

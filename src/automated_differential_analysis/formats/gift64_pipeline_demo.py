@@ -1,9 +1,9 @@
 """Unified A1-A5 configuration for the controlled GIFT-64 pipeline demo.
 
 This contract deliberately composes existing stage contracts instead of copying
-their resource limits, seeds, or key-selection fields.  A future runner can
-resolve this one manifest, then execute the already-versioned A1-A5 boundaries
-without creating a second source of truth for A4 or A5 settings.
+their resource limits, seeds, or key-selection fields.  The composition mode
+also states that the controlled boundaries are orchestrated without claiming
+an unavailable A4-to-A5 artifact lineage.
 """
 
 from __future__ import annotations
@@ -29,7 +29,8 @@ from .gift64_trail_information import (
 )
 
 
-GIFT64_PIPELINE_DEMO_SCHEMA_VERSION = "gift64-pipeline-demo-request/v1"
+GIFT64_PIPELINE_DEMO_SCHEMA_VERSION = "gift64-pipeline-demo-request/v2"
+GIFT64_PIPELINE_COMPOSITION_MODE = "controlled-boundary-orchestration/v1"
 GIFT64_SUPPLEMENTARY_SOURCE_LAYOUT_ID = (
     "gift64-supplementary-differential-source-code/v1"
 )
@@ -91,6 +92,7 @@ class Gift64PipelineDemoConfig:
     schema_version: str
     request_id: str
     profile: str
+    composition_mode: str
     upstream_layout_id: str
     trail_information_schema_version: str
     trail_information_source_sha256: str
@@ -104,6 +106,8 @@ class Gift64PipelineDemoConfig:
         _require_nonempty(self.request_id, "request_id")
         if self.profile not in {"smoke", "formal"}:
             raise Gift64PipelineDemoError("profile must be smoke or formal")
+        if self.composition_mode != GIFT64_PIPELINE_COMPOSITION_MODE:
+            raise Gift64PipelineDemoError("unsupported pipeline composition mode")
         if self.upstream_layout_id != GIFT64_SUPPLEMENTARY_SOURCE_LAYOUT_ID:
             raise Gift64PipelineDemoError("unsupported GIFT-64 upstream layout")
         if self.trail_information_schema_version != GIFT64_TRAIL_INFORMATION_SCHEMA_VERSION:
@@ -119,6 +123,7 @@ class Gift64PipelineDemoConfig:
             "schema_version": self.schema_version,
             "request_id": self.request_id,
             "profile": self.profile,
+            "composition_mode": self.composition_mode,
             "upstream_layout_id": self.upstream_layout_id,
             "trail_information": {
                 "schema_version": self.trail_information_schema_version,
@@ -146,6 +151,7 @@ class Gift64PipelineDemoConfig:
                 "schema_version",
                 "request_id",
                 "profile",
+                "composition_mode",
                 "upstream_layout_id",
                 "trail_information",
                 "trail_position",
@@ -178,6 +184,7 @@ class Gift64PipelineDemoConfig:
             schema_version=data["schema_version"],
             request_id=data["request_id"],
             profile=data["profile"],
+            composition_mode=data["composition_mode"],
             upstream_layout_id=data["upstream_layout_id"],
             trail_information_schema_version=trail_information["schema_version"],
             trail_information_source_sha256=trail_information["source_sha256"],
@@ -197,7 +204,7 @@ class Gift64PipelineDemoConfig:
 
 @dataclass(frozen=True)
 class Gift64PipelineDemoPlan:
-    """Resolved configuration for a future A1-A5 runner."""
+    """Resolved configuration for the controlled A1-A5 orchestrator."""
 
     config: Gift64PipelineDemoConfig
     stage2_request: Gift64Stage2DemoRequest

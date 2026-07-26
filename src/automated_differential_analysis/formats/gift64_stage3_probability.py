@@ -14,7 +14,7 @@ GIFT64_STAGE3_PROBABILITY_REQUEST_SCHEMA_VERSION = (
     "gift64-stage3-probability-request/v2"
 )
 GIFT64_STAGE3_PROBABILITY_OBSERVATION_SCHEMA_VERSION = (
-    "gift64-stage3-probability-observation/v2"
+    "gift64-stage3-probability-observation/v3"
 )
 
 
