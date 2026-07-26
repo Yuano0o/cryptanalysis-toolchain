@@ -1,0 +1,19 @@
+{
+  "key_corpus": {
+    "generator_id": "sha256-counter-v1",
+    "key_count": 8,
+    "purpose": "generated-for-demo",
+    "schema_version": "gift64-stage2-key-corpus/v1",
+    "seed": 20260726
+  },
+  "request_id": "gift64-stage2-demo-a4-trail-position-0",
+  "resources": {
+    "per_key_time_limit_s": 30.0
+  },
+  "schema_version": "gift64-stage2-demo-request/v1",
+  "solver": {
+    "name": "cryptominisat",
+    "version": "5.14.7"
+  },
+  "trail_position": 0
+}

@@ -85,10 +85,10 @@ reproduction or a general performance claim. See
 [project status](docs/current_analysis/project_status.md) for current progress,
 maintenance items, blockers and the next action.
 
-**Next step:** define a deterministic `generated-for-demo` key-corpus contract
-and a bounded Stage 2 adapter with explicit trail selection. The missing
-original `KeyCandidate.out` continues to block paper-level Stage 2
-reproduction, but it does not block the controlled demo; see
+**Next step:** extend the controlled Stage 2 demo across explicitly selected
+physical trail records, or define the separate Stage 3 probability-estimation
+boundary. The missing original `KeyCandidate.out` continues to block
+paper-level Stage 2 reproduction; see
 [materials status](docs/current_analysis/materials_status.md).
 
 ## Current Update — GIFT-64 Pipeline A1
@@ -139,6 +139,19 @@ corresponding rank-6 LC spaces and add incremental rank 2. The comparison is
 recorded through `constraint-space-comparison/v1`; a particular complementary
 equation basis is not treated as unique semantics. See
 [`docs/current_analysis/gift64_linearized_constraints_a3.md`](docs/current_analysis/gift64_linearized_constraints_a3.md).
+
+## Current Update — GIFT-64 Pipeline A4
+
+Stage 2 fixed-key validation now has a bounded, reproducible demo boundary.
+A versioned `generated-for-demo` key corpus uses a portable SHA-256-based
+generator, while a hash-pinned temporary adapter makes the formerly hard-coded
+trail selection explicit and enforces a timeout for each key query.
+
+The result records native solver statuses for one selected physical
+`TrailInformation.out` record. It is not a reproduction of the missing
+million-key `KeyCandidate.out` experiment, a proof-producing `UNSAT` workflow,
+or a paper-level result. See
+[`docs/current_analysis/gift64_stage2_a4.md`](docs/current_analysis/gift64_stage2_a4.md).
 
 ## Planned Evaluation
 

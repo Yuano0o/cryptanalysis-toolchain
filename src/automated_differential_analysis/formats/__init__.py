@@ -13,6 +13,25 @@ from .gift64_trail_information import (
     parse_gift64_trail_information,
     parse_gift64_trail_information_bytes,
 )
+from .gift64_stage2_key_corpus import (
+    GIFT64_STAGE2_DEMO_GENERATOR_ID,
+    GIFT64_STAGE2_DEMO_PURPOSE,
+    GIFT64_STAGE2_KEY_CORPUS_SCHEMA_VERSION,
+    Gift64Stage2KeyCorpusError,
+    Gift64Stage2KeyCorpusSpec,
+    generate_stage2_key_corpus,
+    generated_stage2_key_corpus_bytes,
+    generated_stage2_key_words,
+    parse_stage2_key_corpus,
+    parse_stage2_key_corpus_bytes,
+    stage2_key_corpus_legacy_bytes,
+)
+from .gift64_stage2_demo_request import (
+    GIFT64_STAGE2_DEMO_REQUEST_SCHEMA_VERSION,
+    Gift64Stage2DemoRequest,
+    Gift64Stage2DemoRequestError,
+    load_gift64_stage2_demo_request,
+)
 
 __all__ = [
     "DEFAULT_GIFT64_TRAIL_INFORMATION_LAYOUT",
@@ -26,4 +45,19 @@ __all__ = [
     "Gift64WordState",
     "parse_gift64_trail_information",
     "parse_gift64_trail_information_bytes",
+    "GIFT64_STAGE2_DEMO_GENERATOR_ID",
+    "GIFT64_STAGE2_DEMO_PURPOSE",
+    "GIFT64_STAGE2_KEY_CORPUS_SCHEMA_VERSION",
+    "Gift64Stage2KeyCorpusError",
+    "Gift64Stage2KeyCorpusSpec",
+    "generate_stage2_key_corpus",
+    "generated_stage2_key_corpus_bytes",
+    "generated_stage2_key_words",
+    "parse_stage2_key_corpus",
+    "parse_stage2_key_corpus_bytes",
+    "stage2_key_corpus_legacy_bytes",
+    "GIFT64_STAGE2_DEMO_REQUEST_SCHEMA_VERSION",
+    "Gift64Stage2DemoRequest",
+    "Gift64Stage2DemoRequestError",
+    "load_gift64_stage2_demo_request",
 ]
