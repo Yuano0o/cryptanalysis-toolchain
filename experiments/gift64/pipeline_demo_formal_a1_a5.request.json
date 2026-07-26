@@ -1,0 +1,28 @@
+{
+  "profile": "formal",
+  "request_id": "gift64-a1-a5-formal-trail-position-0",
+  "schema_version": "gift64-pipeline-demo-request/v1",
+  "stages": {
+    "a1": {
+      "enabled": true
+    },
+    "a2": {
+      "enabled": true
+    },
+    "a3": {
+      "enabled": true
+    },
+    "a4": {
+      "request_path": "stage2_demo_a4.request.json"
+    },
+    "a5": {
+      "request_path": "stage3_probability_a5.request.json"
+    }
+  },
+  "trail_information": {
+    "schema_version": "gift64-trail-information/v1",
+    "source_sha256": "fe40ca7b81d4c362d45db58c7c4448317d0305bbd149e04abe12bcede8c02335"
+  },
+  "trail_position": 0,
+  "upstream_layout_id": "gift64-supplementary-differential-source-code/v1"
+}

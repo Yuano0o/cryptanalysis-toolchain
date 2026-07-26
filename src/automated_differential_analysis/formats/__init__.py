@@ -32,6 +32,15 @@ from .gift64_stage2_demo_request import (
     Gift64Stage2DemoRequestError,
     load_gift64_stage2_demo_request,
 )
+from .gift64_pipeline_demo import (
+    GIFT64_PIPELINE_DEMO_SCHEMA_VERSION,
+    GIFT64_SUPPLEMENTARY_SOURCE_LAYOUT_ID,
+    Gift64PipelineDemoConfig,
+    Gift64PipelineDemoError,
+    Gift64PipelineDemoPlan,
+    load_gift64_pipeline_demo_config,
+    load_gift64_pipeline_demo_plan,
+)
 from .gift64_stage3_probability import (
     GIFT64_STAGE3_PROBABILITY_OBSERVATION_SCHEMA_VERSION,
     GIFT64_STAGE3_PROBABILITY_REQUEST_SCHEMA_VERSION,
@@ -69,6 +78,13 @@ __all__ = [
     "Gift64Stage2DemoRequest",
     "Gift64Stage2DemoRequestError",
     "load_gift64_stage2_demo_request",
+    "GIFT64_PIPELINE_DEMO_SCHEMA_VERSION",
+    "GIFT64_SUPPLEMENTARY_SOURCE_LAYOUT_ID",
+    "Gift64PipelineDemoConfig",
+    "Gift64PipelineDemoError",
+    "Gift64PipelineDemoPlan",
+    "load_gift64_pipeline_demo_config",
+    "load_gift64_pipeline_demo_plan",
     "GIFT64_STAGE3_PROBABILITY_OBSERVATION_SCHEMA_VERSION",
     "GIFT64_STAGE3_PROBABILITY_REQUEST_SCHEMA_VERSION",
     "Gift64Stage3ProbabilityError",
