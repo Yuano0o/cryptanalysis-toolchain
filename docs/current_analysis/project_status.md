@@ -11,9 +11,9 @@
 |---|---|---|
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
-| Stage-contract schema design | in-progress | Solver contracts and `TrailRecord` implemented and exercised; later-stage contracts remain drafts |
+| Stage-contract schema design | in-progress | Solver contracts, `TrailRecord` and `gift64-trail-information/v1` are implemented and exercised; later-stage contracts remain drafts |
 | SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
-| Workstream A pipeline implementation | deferred | Supplementary material gaps must be resolved before formal pipeline implementation resumes |
+| Workstream A pipeline implementation | in-progress | Controlled SAT adapter and first normalized upstream artifact parser are complete; LC/LNC and later stages are not implemented |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -41,9 +41,9 @@ Completed checkpoints:
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
-| Common artifact contracts | in-progress | Solver contracts and minimal versioned `TrailRecord` implemented; later-stage fields remain specified drafts | Extend `TrailRecord` only when parser/model decoding requires it | Later representation choices need validation |
+| Common artifact contracts | in-progress | Solver contracts, minimal `TrailRecord` and `gift64-trail-information/v1` implemented | Define LC `ConstraintSet` from actual producer/consumer semantics | Later representation choices need validation |
 | SAT trail search boundary | complete | B1-B7 pass; live audit reruns preserved verified `SAT` with components `11`/`1` | Maintain the audit register; reuse only within its supported-claim boundary | No A1/A2 blocker |
-| `TrailInformation.out` parser | ready | Inputs available | Recover exact token boundaries and ordering | None |
+| `TrailInformation.out` parser | complete | A1 recovers 32 records, `[5,13)` rounds, round-4 key-state anchor and MSB-first order; 47-test suite passes | Use as the only normalized trail input for A2 | Exact trail selection/concatenation provenance is missing |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
 | Stage 2 fixed-key validation | blocked | Code inspected | Obtain/generate `KeyCandidate.out` reproducibly | Missing generator/file provenance |
@@ -75,9 +75,9 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Resolve the missing GIFT pipeline materials and choose a bounded formal
-   pipeline target.
-2. Keep A1/A2 exploratory work frozen until that decision is recorded.
+1. Recover the LC output semantics and define a versioned `ConstraintSet`
+   contract against parsed trails.
+2. Add a small bounded legacy-equivalence oracle before implementing LNC.
 
 ## SAT baseline maintenance register
 
@@ -119,3 +119,7 @@ The authoritative details and completion evidence are in
 - 2026-07-26: audited B1-B7 by static review, 39 tests, a live B6 regression
   and a repeated B7 comparison; accepted the baseline for scoped reuse and
   recorded five non-blocking or future-gated maintenance items.
+- 2026-07-26: completed pipeline A1 with a strict
+  `gift64-trail-information/v1` parser, recovered round/word/group semantics and
+  integration checks for all four immutable upstream copies; trail
+  selection/concatenation provenance remains unavailable.

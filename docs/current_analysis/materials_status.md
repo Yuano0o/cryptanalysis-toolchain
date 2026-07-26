@@ -16,7 +16,8 @@ The current workspace is sufficient to:
 
 - execute and independently validate the controlled GIFT-64 four-round SAT
   baseline;
-- recover the GIFT `TrailInformation.out` schema;
+- parse and structurally validate the supplied GIFT `TrailInformation.out`
+  corpus through a versioned contract;
 - design LC/LNC contracts;
 - build small parser and verifier fixtures that do not invoke a solver.
 
@@ -48,7 +49,8 @@ It is not sufficient to reproduce the complete GIFT differential-level paper.
 | Linearisation paper | available | `../papers/gift64-differential/02_linearisation_method_differential_dependencies.pdf` | LC/LNC and three-stage evaluation | None |
 | LED64/Midori64 paper | available | `../papers/gift64-differential/03_more_accurate_differential_properties_led64_midori64.pdf` | Max-PoSSo/fixed-key method history | None |
 | Six GIFT stage programs | available | `../upstream/Supplementary_Material_GIFT-64_Differential/Source_code/` | Direct pipeline reference | Keep read-only |
-| `TrailInformation.out` | available | Included in GIFT stages 2-5 | Trail parser and LC/LNC input fixture | Recover formal schema and ordering |
+| `TrailInformation.out` | available | Four byte-identical stage 2-5 copies; `gift64-trail-information/v1` parser and tests | Normalized LC/LNC input fixture | Preserve source hash; request trail-selection/concatenation provenance |
+| Trail selection/group manifest | missing-nonblocking | Producer handles one `GroupIndex`; bundled corpus contains eight positional groups in a different order | Exact regeneration of the 32-trail fixture | Obtain commands, seeds, selection rule and position-to-`GroupIndex` map |
 | `KeyCandidate1000.out` | available | Included in GIFT stage 5 | Stage 3 input fixture | Recover format and provenance limitations |
 | `KeyCandidate.out` | missing-blocking | Referenced by stage 4, not included | Paper-level Stage 2 reproduction | Obtain generator, distribution, seed and hash |
 | `AllMatrix33Trail.out` | partial | Included in GIFT stage 6 | Coexistence input fixture | Generator and semantic schema are missing |
