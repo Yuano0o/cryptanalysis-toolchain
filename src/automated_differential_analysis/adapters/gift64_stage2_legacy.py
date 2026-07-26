@@ -33,6 +33,7 @@ from shared.sat import SolverStatus
 
 
 GIFT64_STAGE2_ADAPTER_VERSION = "gift64-stage2-legacy-adapter/v1"
+GIFT64_STAGE2_OBSERVATION_SCHEMA_VERSION = "gift64-stage2-observation/v2"
 GIFT64_STAGE2_SOURCE_SHA256 = (
     "58f5d24110cf8170de6cc0f1cdd29657abc1463bf044703756e052b640275964"
 )
@@ -59,7 +60,8 @@ class Gift64Stage2KeyResult:
     """One controlled SAT query for one generated primary master key."""
 
     key_index: int
-    status: SolverStatus
+    execution_state: str
+    status: SolverStatus | None
     wall_time_s: float
     cpu_time_s: float
     exit_code: int | None
@@ -71,8 +73,19 @@ class Gift64Stage2KeyResult:
             raise Gift64Stage2AdapterError("key_index must be an integer")
         if self.key_index < 0:
             raise Gift64Stage2AdapterError("key_index must be non-negative")
-        if not isinstance(self.status, SolverStatus):
-            raise Gift64Stage2AdapterError("status must be a SolverStatus")
+        if self.execution_state not in {"ran", "not_started_total_budget"}:
+            raise Gift64Stage2AdapterError("unsupported Stage 2 execution state")
+        if self.execution_state == "ran" and not isinstance(self.status, SolverStatus):
+            raise Gift64Stage2AdapterError("ran key result must carry a SolverStatus")
+        if self.execution_state == "not_started_total_budget":
+            if self.status is not None:
+                raise Gift64Stage2AdapterError(
+                    "unstarted key result must not carry a solver status"
+                )
+            if any((self.wall_time_s, self.cpu_time_s)) or self.exit_code is not None:
+                raise Gift64Stage2AdapterError(
+                    "unstarted key result must not carry execution measurements"
+                )
         if self.wall_time_s < 0 or self.cpu_time_s < 0:
             raise Gift64Stage2AdapterError("run times must be non-negative")
         if self.stdout_sha256 is not None and re.fullmatch(
@@ -83,7 +96,8 @@ class Gift64Stage2KeyResult:
     def to_dict(self) -> dict[str, Any]:
         return {
             "key_index": self.key_index,
-            "status": self.status.value,
+            "execution_state": self.execution_state,
+            "status": None if self.status is None else self.status.value,
             "wall_time_s": self.wall_time_s,
             "cpu_time_s": self.cpu_time_s,
             "exit_code": self.exit_code,
@@ -104,8 +118,11 @@ class Gift64Stage2Observation:
     trail_position: int
     solver_version: str
     per_key_time_limit_s: float
+    total_time_limit_s: float
     results: tuple[Gift64Stage2KeyResult, ...]
     compile_wall_time_s: float
+    run_wall_time_s: float
+    total_time_budget_exhausted: bool
     instrumented_source_sha256: str
 
     def __post_init__(self) -> None:
@@ -131,8 +148,12 @@ class Gift64Stage2Observation:
             raise Gift64Stage2AdapterError("trail_position must be non-negative")
         if self.per_key_time_limit_s <= 0:
             raise Gift64Stage2AdapterError("per_key_time_limit_s must be positive")
+        if self.total_time_limit_s <= 0:
+            raise Gift64Stage2AdapterError("total_time_limit_s must be positive")
         if self.compile_wall_time_s < 0:
             raise Gift64Stage2AdapterError("compile_wall_time_s must be non-negative")
+        if self.run_wall_time_s < 0:
+            raise Gift64Stage2AdapterError("run_wall_time_s must be non-negative")
         if len(self.results) != self.key_corpus_spec.key_count:
             raise Gift64Stage2AdapterError(
                 "Stage 2 result count must match the configured key corpus"
@@ -144,11 +165,14 @@ class Gift64Stage2Observation:
 
     def summary_dict(self) -> dict[str, Any]:
         status_counts = {
-            status.value: sum(item.status is status for item in self.results)
+            status.value: sum(
+                item.execution_state == "ran" and item.status is status
+                for item in self.results
+            )
             for status in SolverStatus
         }
         return {
-            "schema_version": "gift64-stage2-observation/v1",
+            "schema_version": GIFT64_STAGE2_OBSERVATION_SCHEMA_VERSION,
             "adapter_version": self.adapter_version,
             "scope": "generated-for-demo fixed-key validation",
             "source_sha256": self.source_sha256,
@@ -158,9 +182,16 @@ class Gift64Stage2Observation:
             "trail_position": self.trail_position,
             "solver_version": self.solver_version,
             "per_key_time_limit_s": self.per_key_time_limit_s,
+            "total_time_limit_s": self.total_time_limit_s,
             "compile_wall_time_s": self.compile_wall_time_s,
+            "run_wall_time_s": self.run_wall_time_s,
+            "total_time_budget_exhausted": self.total_time_budget_exhausted,
             "instrumented_source_sha256": self.instrumented_source_sha256,
             "status_counts": status_counts,
+            "not_started_total_budget_count": sum(
+                item.execution_state == "not_started_total_budget"
+                for item in self.results
+            ),
             "results": [item.to_dict() for item in self.results],
             "claim_boundary": (
                 "native solver statuses for a generated demo corpus; not a "
@@ -294,6 +325,7 @@ def _run_one_key(
     key_index: int,
     trail_position: int,
     time_limit_s: float,
+    timeout_reason: str,
 ) -> Gift64Stage2KeyResult:
     (build_root / "KeyCandidate.out").write_bytes(
         stage2_key_corpus_legacy_bytes((key_words,))
@@ -312,12 +344,13 @@ def _run_one_key(
     except subprocess.TimeoutExpired:
         return Gift64Stage2KeyResult(
             key_index=key_index,
+            execution_state="ran",
             status=SolverStatus.TIMEOUT,
             wall_time_s=time.monotonic() - start,
             cpu_time_s=_cpu_time(before_cpu, os.times()),
             exit_code=None,
             stdout_sha256=None,
-            diagnostics=("Stage 2 process exceeded per-key timeout",),
+            diagnostics=(timeout_reason,),
         )
     wall_time_s = time.monotonic() - start
     cpu_time_s = _cpu_time(before_cpu, os.times())
@@ -325,6 +358,7 @@ def _run_one_key(
     if completed.returncode != 0:
         return Gift64Stage2KeyResult(
             key_index=key_index,
+            execution_state="ran",
             status=SolverStatus.ERROR,
             wall_time_s=wall_time_s,
             cpu_time_s=cpu_time_s,
@@ -341,6 +375,7 @@ def _run_one_key(
     except Gift64Stage2AdapterError as exc:
         return Gift64Stage2KeyResult(
             key_index=key_index,
+            execution_state="ran",
             status=SolverStatus.ERROR,
             wall_time_s=wall_time_s,
             cpu_time_s=cpu_time_s,
@@ -350,12 +385,28 @@ def _run_one_key(
         )
     return Gift64Stage2KeyResult(
         key_index=key_index,
+        execution_state="ran",
         status=status,
         wall_time_s=wall_time_s,
         cpu_time_s=cpu_time_s,
         exit_code=completed.returncode,
         stdout_sha256=stdout_sha256,
         diagnostics=("native status from hash-pinned temporary instrumentation",),
+    )
+
+
+def _not_started_total_budget_result(key_index: int) -> Gift64Stage2KeyResult:
+    """Record a key skipped before process launch because total budget ended."""
+
+    return Gift64Stage2KeyResult(
+        key_index=key_index,
+        execution_state="not_started_total_budget",
+        status=None,
+        wall_time_s=0.0,
+        cpu_time_s=0.0,
+        exit_code=None,
+        stdout_sha256=None,
+        diagnostics=("Stage 2 total run time budget was exhausted before launch",),
     )
 
 
@@ -366,6 +417,7 @@ def run_gift64_stage2_demo(
     key_corpus_spec: Gift64Stage2KeyCorpusSpec,
     trail_position: int,
     per_key_time_limit_s: float,
+    total_time_limit_s: float,
     compiler: str = "clang++",
     cms_prefix: Path | None = None,
     gmp_prefix: Path | None = None,
@@ -374,10 +426,13 @@ def run_gift64_stage2_demo(
 
     if per_key_time_limit_s <= 0:
         raise Gift64Stage2AdapterError("per_key_time_limit_s must be positive")
+    if total_time_limit_s <= 0:
+        raise Gift64Stage2AdapterError("total_time_limit_s must be positive")
     if not isinstance(key_corpus_spec, Gift64Stage2KeyCorpusSpec):
         raise Gift64Stage2AdapterError(
             "key_corpus_spec must be a Gift64Stage2KeyCorpusSpec"
         )
+    run_start = time.monotonic()
     source = source_path.read_bytes()
     instrumented = instrument_gift64_stage2_source(
         source, trail_position=trail_position
@@ -400,6 +455,7 @@ def run_gift64_stage2_demo(
         )
     keys = generate_stage2_key_corpus(key_corpus_spec)
     key_corpus_bytes = stage2_key_corpus_legacy_bytes(keys)
+    total_time_budget_exhausted = False
     with tempfile.TemporaryDirectory(prefix="gift64-stage2-") as temporary_directory:
         build_root = Path(temporary_directory)
         temporary_source = build_root / "main.instrumented.cpp"
@@ -423,35 +479,61 @@ def run_gift64_stage2_demo(
             "-o",
             str(executable),
         ]
-        compile_start = time.monotonic()
-        try:
-            compiled = subprocess.run(
-                compile_command,
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=60,
-            )
-        except subprocess.TimeoutExpired as exc:
-            raise Gift64Stage2AdapterError(
-                "temporary Stage 2 compilation timed out"
-            ) from exc
-        compile_wall_time_s = time.monotonic() - compile_start
-        if compiled.returncode != 0:
-            raise Gift64Stage2AdapterError(
-                "temporary Stage 2 compilation failed: " + compiled.stderr.strip()
-            )
-        results = tuple(
-            _run_one_key(
-                executable,
-                build_root,
-                key_words,
-                key_index=key_index,
-                trail_position=trail_position,
-                time_limit_s=per_key_time_limit_s,
-            )
-            for key_index, key_words in enumerate(keys)
-        )
+        remaining_before_compile = total_time_limit_s - (time.monotonic() - run_start)
+        if remaining_before_compile <= 0:
+            compile_wall_time_s = 0.0
+            total_time_budget_exhausted = True
+            results = tuple(_not_started_total_budget_result(index) for index in range(len(keys)))
+        else:
+            compile_start = time.monotonic()
+            try:
+                compiled = subprocess.run(
+                    compile_command,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=min(60.0, remaining_before_compile),
+                )
+            except subprocess.TimeoutExpired:
+                compile_wall_time_s = time.monotonic() - compile_start
+                total_time_budget_exhausted = True
+                results = tuple(_not_started_total_budget_result(index) for index in range(len(keys)))
+            else:
+                compile_wall_time_s = time.monotonic() - compile_start
+                if compiled.returncode != 0:
+                    raise Gift64Stage2AdapterError(
+                        "temporary Stage 2 compilation failed: " + compiled.stderr.strip()
+                    )
+                result_items: list[Gift64Stage2KeyResult] = []
+                for key_index, key_words in enumerate(keys):
+                    remaining = total_time_limit_s - (time.monotonic() - run_start)
+                    if remaining <= 0:
+                        total_time_budget_exhausted = True
+                        result_items.extend(
+                            _not_started_total_budget_result(index)
+                            for index in range(key_index, len(keys))
+                        )
+                        break
+                    time_limit_s = min(per_key_time_limit_s, remaining)
+                    timeout_reason = (
+                        "Stage 2 total run time budget was exhausted during this key"
+                        if remaining < per_key_time_limit_s
+                        else "Stage 2 process exceeded per-key timeout"
+                    )
+                    result = _run_one_key(
+                        executable,
+                        build_root,
+                        key_words,
+                        key_index=key_index,
+                        trail_position=trail_position,
+                        time_limit_s=time_limit_s,
+                        timeout_reason=timeout_reason,
+                    )
+                    result_items.append(result)
+                    if result.status is SolverStatus.TIMEOUT and remaining < per_key_time_limit_s:
+                        total_time_budget_exhausted = True
+                results = tuple(result_items)
+    run_wall_time_s = time.monotonic() - run_start
     return Gift64Stage2Observation(
         adapter_version=GIFT64_STAGE2_ADAPTER_VERSION,
         source_sha256=_sha256(source),
@@ -461,7 +543,10 @@ def run_gift64_stage2_demo(
         trail_position=trail_position,
         solver_version=solver_version,
         per_key_time_limit_s=per_key_time_limit_s,
+        total_time_limit_s=total_time_limit_s,
         results=results,
         compile_wall_time_s=compile_wall_time_s,
+        run_wall_time_s=run_wall_time_s,
+        total_time_budget_exhausted=total_time_budget_exhausted,
         instrumented_source_sha256=_sha256(instrumented),
     )

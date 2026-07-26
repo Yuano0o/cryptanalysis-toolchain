@@ -31,7 +31,7 @@ def main() -> int:
         "--request",
         type=Path,
         default=(
-            REPOSITORY_ROOT / "experiments/gift64/stage2_demo_a4.request.json"
+            REPOSITORY_ROOT / "experiments/gift64/stage2_demo_smoke_a4.request.json"
         ),
         help="versioned demo request JSON",
     )
@@ -58,6 +58,7 @@ def main() -> int:
             key_corpus_spec=request.key_corpus,
             trail_position=request.trail_position,
             per_key_time_limit_s=request.per_key_time_limit_s,
+            total_time_limit_s=request.total_time_limit_s,
         )
     except (Gift64Stage2AdapterError, Gift64Stage2DemoRequestError, OSError) as exc:
         print(f"Stage 2 demo failed: {exc}", file=sys.stderr)

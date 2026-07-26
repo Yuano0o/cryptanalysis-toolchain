@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -13,7 +14,7 @@ from .gift64_stage2_key_corpus import (
 )
 
 
-GIFT64_STAGE2_DEMO_REQUEST_SCHEMA_VERSION = "gift64-stage2-demo-request/v1"
+GIFT64_STAGE2_DEMO_REQUEST_SCHEMA_VERSION = "gift64-stage2-demo-request/v2"
 
 
 class Gift64Stage2DemoRequestError(ValueError):
@@ -56,7 +57,12 @@ def _require_nonnegative_int(value: Any, field_name: str) -> int:
 
 
 def _require_positive_number(value: Any, field_name: str) -> float:
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or value <= 0
+    ):
         raise Gift64Stage2DemoRequestError(
             f"{field_name} must be a positive number"
         )
@@ -72,6 +78,7 @@ class Gift64Stage2DemoRequest:
     solver_name: str
     solver_version: str
     per_key_time_limit_s: float
+    total_time_limit_s: float
 
     def __post_init__(self) -> None:
         if self.schema_version != GIFT64_STAGE2_DEMO_REQUEST_SCHEMA_VERSION:
@@ -91,6 +98,7 @@ class Gift64Stage2DemoRequest:
             raise Gift64Stage2DemoRequestError("Stage 2 supports cryptominisat only")
         _require_nonempty(self.solver_version, "solver_version")
         _require_positive_number(self.per_key_time_limit_s, "per_key_time_limit_s")
+        _require_positive_number(self.total_time_limit_s, "total_time_limit_s")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -102,7 +110,10 @@ class Gift64Stage2DemoRequest:
                 "name": self.solver_name,
                 "version": self.solver_version,
             },
-            "resources": {"per_key_time_limit_s": self.per_key_time_limit_s},
+            "resources": {
+                "per_key_time_limit_s": self.per_key_time_limit_s,
+                "total_time_limit_s": self.total_time_limit_s,
+            },
         }
 
     def to_json(self) -> str:
@@ -134,7 +145,11 @@ class Gift64Stage2DemoRequest:
         solver = _expect_mapping(data["solver"], "solver")
         _expect_exact_keys(solver, {"name", "version"}, "solver")
         resources = _expect_mapping(data["resources"], "resources")
-        _expect_exact_keys(resources, {"per_key_time_limit_s"}, "resources")
+        _expect_exact_keys(
+            resources,
+            {"per_key_time_limit_s", "total_time_limit_s"},
+            "resources",
+        )
         try:
             corpus_spec = Gift64Stage2KeyCorpusSpec(
                 schema_version=key_corpus["schema_version"],
@@ -153,6 +168,7 @@ class Gift64Stage2DemoRequest:
             solver_name=solver["name"],
             solver_version=solver["version"],
             per_key_time_limit_s=resources["per_key_time_limit_s"],
+            total_time_limit_s=resources["total_time_limit_s"],
         )
 
     @classmethod

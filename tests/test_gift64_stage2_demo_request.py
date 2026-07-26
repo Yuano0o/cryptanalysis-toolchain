@@ -25,7 +25,7 @@ def valid_request() -> dict[str, object]:
             "key_count": 2,
         },
         "solver": {"name": "cryptominisat", "version": "5.14.7"},
-        "resources": {"per_key_time_limit_s": 3.0},
+        "resources": {"per_key_time_limit_s": 3.0, "total_time_limit_s": 10.0},
     }
 
 
@@ -49,6 +49,12 @@ class Gift64Stage2DemoRequestTests(unittest.TestCase):
         data = valid_request()
         data["trail_position"] = 32
         with self.assertRaisesRegex(Gift64Stage2DemoRequestError, "0..31"):
+            Gift64Stage2DemoRequest.from_dict(data)
+
+    def test_request_requires_finite_total_time_budget(self) -> None:
+        data = valid_request()
+        data["resources"]["total_time_limit_s"] = float("inf")
+        with self.assertRaisesRegex(Gift64Stage2DemoRequestError, "positive"):
             Gift64Stage2DemoRequest.from_dict(data)
 
 

@@ -16,15 +16,17 @@ versioned generated-for-demo key-corpus specification
   -> canonical temporary KeyCandidate.out (eight 16-bit words per key)
   -> hash-pinned temporary one-key / one-trail Stage 2 source copy
   -> native CryptoMiniSat status marker
-  -> gift64-stage2-observation/v1 JSON-compatible summary
+  -> gift64-stage2-observation/v2 JSON-compatible summary
 ```
 
-The tracked request
+The formal demo request
 [`experiments/gift64/stage2_demo_a4.request.json`](../../experiments/gift64/stage2_demo_a4.request.json)
-selects physical trail-record position 0 and eight deterministic 128-bit keys.
-It uses a 30-second limit **per key**, not a hard-coded million-key loop.
-Generated keys, solver stdout, logs, binaries and result summaries remain
-temporary and untracked.
+selects physical trail-record position 0 and 1,000 deterministic 128-bit keys.
+It has a 30-second limit per key and a finite 120-second total run budget. The
+separate default smoke request
+[`experiments/gift64/stage2_demo_smoke_a4.request.json`](../../experiments/gift64/stage2_demo_smoke_a4.request.json)
+uses eight keys and a 60-second total budget. Generated keys, solver stdout,
+logs, binaries and result summaries remain temporary and untracked.
 
 Run the demo from the repository root with:
 
@@ -32,8 +34,10 @@ Run the demo from the repository root with:
 PYTHONPATH=src python3 scripts/run_gift64_stage2_demo.py
 ```
 
-The command prints a structured summary to stdout. Redirect it outside the
-repository if the local result needs to be retained.
+The command runs the smoke request by default and prints a structured summary
+to stdout. Use `--request experiments/gift64/stage2_demo_a4.request.json` for
+the formal 1,000-key demo. Redirect output outside the repository if a local
+result needs to be retained.
 
 ## What the upstream Stage 2 program tests
 
@@ -85,7 +89,14 @@ against fixed source anchors before changing only these controls:
 The DDT construction, key schedule, SAT clauses, affine constraints, solver
 call and legacy stdout are otherwise left in the source's execution path. Each
 key is launched in a separate process, which makes the configured timeout a
-real per-key resource limit rather than a single ambiguous batch timeout.
+real per-key resource limit rather than a single ambiguous batch timeout. The
+request also has a finite total budget covering compilation and all key runs.
+If it expires before a key starts, the result records
+`execution_state: not_started_total_budget` and `status: null`; it is not
+counted as a native solver status. If it expires while a launched key is still
+running, that launched process is recorded as `TIMEOUT` with a total-budget
+diagnostic. Every observation records `run_wall_time_s` and whether its total
+budget was exhausted.
 
 The selected position is deliberately a **physical TrailInformation record
 position** in `0..31`, not an inferred producer `GroupIndex`. The supplied
@@ -115,12 +126,13 @@ Implementation:
 - `scripts/run_gift64_stage2_demo.py`
 
 Tests cover deterministic generation/encoding, malformed-corpus rejection,
-strict request validation, hash-pinned source instrumentation, explicit trail
-binding and marker parsing. A real one-key integration test compiles the
-temporary source with CryptoMiniSat 5.14.7 and requires one definitive native
-`SAT` or `UNSAT` status with exit code zero. A local eight-key run of the
-tracked request completed under the configured limits; the generated outcome
-is intentionally not committed as a research result.
+strict request validation including finite total budgets, hash-pinned source
+instrumentation, explicit trail binding, marker parsing and the distinction
+between unstarted budget-skipped keys and solver statuses. A real one-key
+integration test compiles the temporary source with CryptoMiniSat 5.14.7 and
+requires one definitive native `SAT` or `UNSAT` status with exit code zero. A
+local eight-key smoke run completed under the configured limits; the generated
+outcome is intentionally not committed as a research result.
 
 ## Reporting language and boundaries
 
@@ -143,8 +155,8 @@ Do not state that A4:
 
 ## Next boundary
 
-A4 is sufficient for a visible fixed-key demo. The next engineering choice is
-whether to run the same controlled request over more physical trail positions
-or to proceed to Stage 3's separate probability-estimation boundary. Any
-larger demo should set an explicit total time budget and retain only its
-untracked local run summary; it must retain the `generated-for-demo` label.
+A4 now has bounded smoke and formal-demo requests. The next integration step
+is one unified A1-A5 configuration and runner, followed by a small end-to-end
+regression and an automatically generated cross-stage summary. Any extension
+to more physical trail positions must retain the `generated-for-demo` label
+and declare its own total budget.
