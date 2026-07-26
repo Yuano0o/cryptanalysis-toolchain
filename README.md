@@ -98,13 +98,15 @@ through explicit, versioned boundaries:
 | A3 | LC plus linearised-relation spaces: rank 8, incremental rank 2, LC implied for all 32 records | [A3 details](docs/current_analysis/gift64_linearized_constraints_a3.md) |
 | A4 | Deterministic generated-key Stage 2 demo with explicit trail position and native per-key statuses | [A4 details](docs/current_analysis/gift64_stage2_a4.md) |
 | A5 | Seeded, budgeted Stage 3 subcube counting with completion-gated descriptive probability output | [A5 details](docs/current_analysis/gift64_stage3_a5.md) |
+| A1-A5 config | Validated smoke/formal manifest binds the shared fixture/trail and referenced A4/A5 requests | [Configuration details](docs/current_analysis/gift64_pipeline_a1_a5_config.md) |
 
 These checkpoints support a non-paper-reproduction demo. The missing original
 `KeyCandidate.out`, trail-generation provenance and proof-producing `UNSAT`
 workflow still limit stronger claims.
 
-**Next step:** add one unified A1-A5 configuration, pipeline runner,
-end-to-end regression and generated summary. Only after that integration
+**Next step:** implement the A1-A5 pipeline runner using the unified
+configuration, then add an end-to-end regression and generated summary. Only
+after that integration
 boundary passes should the project record the seven-item demo acceptance and
 move to coexistence-matrix semantics. See
 [project status](docs/current_analysis/project_status.md) for the acceptance

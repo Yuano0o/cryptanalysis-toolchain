@@ -48,7 +48,7 @@ Completed checkpoints:
 | LNC extraction adapter | complete | A3 normalizes 32 combined rank-8 spaces; every LC base is implied with incremental rank 2 | Reuse the comparison boundary in Stage 2 reporting | Current exactness is relative to pinned legacy source |
 | Stage 2 fixed-key validation | complete-draft | A4 has deterministic key generation, source/trail pinning, explicit physical trail selection, smoke/formal request split, per-key and total budgets, total wall time, and unstarted-budget semantics separate from solver statuses | Integrate its formal request into the A1-A5 runner | Original million-key result remains blocked by missing provenance and no UNSAT proof is emitted |
 | Stage 3 probability | complete-draft | A5 has deterministic subcube sampling, source/fixture pinning, explicit key/trail positions, per-sample and total budgets, 64-bit complete-count checks and completion-gated descriptive estimates | Extend selected key/trail coverage under the declared total budget | Fixture generator/provenance is missing; no global exact/probability claim |
-| Unified demo runner | not-started | A1-A5 have separate scripts and versioned stage-specific requests | Define one orchestration request and run A1-A5 in dependency order | Cross-stage status/failure semantics remain to be defined |
+| Unified demo runner | in-progress | `gift64-pipeline-demo-request/v1` composes validated smoke/formal A1-A5 plans; stages still have separate scripts | Implement runner in dependency order and define cross-stage failures | No integrated execution/summary yet |
 | End-to-end demo regression | not-started | Stage-level unit and integration tests pass independently | Add one small deterministic A1-A5 regression using smoke-sized inputs | No unified runner or integrated observation yet |
 | Integrated result summary | not-started | A1-A5 each expose structured or JSON-compatible summaries | Define one provenance-preserving pipeline summary | Cross-stage status and failure semantics are not yet defined |
 | Trail coexistence | ready-for-static-work | Code and matrix present | Recover matrix semantics | Matrix generator absent |
@@ -78,7 +78,8 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Define one unified A1-A5 demo configuration and pipeline runner.
+1. Implement an A1-A5 pipeline runner consuming the unified smoke/formal
+   configuration and define cross-stage failure semantics.
 2. Add a smoke-sized end-to-end regression and a provenance-preserving
    generated summary.
 3. Review the seven-item integrated-demo acceptance boundary.
@@ -93,7 +94,7 @@ Completed checkpoints:
 | LC/LNC merge or association rule | complete | Combined space must imply LC; incremental rank records the added information without treating a complementary basis as unique |
 | Stage 2 configurable sample count and deterministic keys | complete | A4 v2 has `sha256-counter-v1`, separate eight-key smoke and 1,000-key formal requests, finite total budget and explicit unstarted-budget results |
 | Stage 3 fixed seed and unified probability result format | complete-draft | A5 v2 request/observation has deterministic sampling, finite budgets and completion-gated descriptive estimates |
-| Unified configuration and pipeline runner | not-started | Current stage requests and scripts are separate |
+| Unified configuration and pipeline runner | partial | Smoke/formal `gift64-pipeline-demo-request/v1` manifests validate common fixture identity, trail position and referenced A4/A5 request profiles; runner remains unimplemented |
 | End-to-end small regression | not-started | Stage-level integrations exist, but no single A1-A5 orchestration regression exists |
 | Automatically generated result summary | partial | Each stage can summarize itself; no integrated cross-stage summary exists |
 | Final acceptance after all seven items are integrated | not-started | Depends on A4 hardening, runner, end-to-end regression and integrated summary |
@@ -163,3 +164,6 @@ The authoritative details and completion evidence are in
   reporting, and explicit not-started-before-total-budget results that are not
   misreported as solver statuses; the formal local demo completed all 1,000
   keys within its 120-second budget.
+- 2026-07-26: defined `gift64-pipeline-demo-request/v1` smoke and formal A1-A5
+  manifests, including shared fixture/trail identity and validated A4/A5
+  profile composition; no unified runner or integrated observation exists yet.

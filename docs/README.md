@@ -58,6 +58,9 @@ These files reflect the latest full workspace and paper scan:
 - [gift64_stage3_a5.md](current_analysis/gift64_stage3_a5.md): controlled
   deterministic Stage 3 subcube counting, supplied-fixture provenance,
   completion policy and empirical-estimate boundary.
+- [gift64_pipeline_a1_a5_config.md](current_analysis/gift64_pipeline_a1_a5_config.md):
+  unified smoke/formal A1-A5 manifest, stage-request composition rules and
+  runner hand-off boundary.
 
 ### Prior planning
 
