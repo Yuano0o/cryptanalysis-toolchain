@@ -48,6 +48,9 @@ Completed checkpoints:
 | LNC extraction adapter | complete | A3 normalizes 32 combined rank-8 spaces; every LC base is implied with incremental rank 2 | Reuse the comparison boundary in Stage 2 reporting | Current exactness is relative to pinned legacy source |
 | Stage 2 fixed-key validation | complete-draft | A4 has deterministic key generation, source/trail pinning, explicit physical trail selection, per-key timeout and native status summary | Select additional physical positions or proceed to Stage 3 | Original million-key result remains blocked by missing provenance and no UNSAT proof is emitted |
 | Stage 3 probability | complete-draft | A5 has deterministic subcube sampling, source/fixture pinning, explicit key/trail positions, per-sample and total budgets, 64-bit complete-count checks and completion-gated descriptive estimates | Extend selected key/trail coverage under the declared total budget | Fixture generator/provenance is missing; no global exact/probability claim |
+| Unified demo runner | not-started | A1-A5 have separate scripts and versioned stage-specific requests | Define one orchestration request and run A1-A5 in dependency order | A4 total-budget semantics must be fixed first |
+| End-to-end demo regression | not-started | Stage-level unit and integration tests pass independently | Add one small deterministic A1-A5 regression using smoke-sized inputs | No unified runner or integrated observation yet |
+| Integrated result summary | not-started | A1-A5 each expose structured or JSON-compatible summaries | Define one provenance-preserving pipeline summary | Cross-stage status and failure semantics are not yet defined |
 | Trail coexistence | ready-for-static-work | Code and matrix present | Recover matrix semantics | Matrix generator absent |
 | 18/19-round construction | blocked | Paper results known | Obtain/formalise extension construction | No generator/entry found |
 | Attack-level regression | blocked | Improved paper and two small source files present | Request missing enumeration/attack code | Public archive incomplete |
@@ -75,10 +78,32 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Decide whether to extend A5 across selected fixture-key/trail positions
-   under a fixed total time budget, and define aggregation assumptions.
-2. Recover the Stage 6 coexistence-matrix semantics without claiming to
+1. Harden A4 before orchestration:
+   - add a finite total run-time budget covering compilation and all key runs;
+   - retain an 8-key smoke request and add a separate 1,000-key formal-demo
+     request;
+   - expose total-budget exhaustion without presenting unrun keys as native
+     solver outcomes;
+   - record total run wall time in the observation.
+2. Define one unified A1-A5 demo configuration and pipeline runner.
+3. Add a smoke-sized end-to-end regression and a provenance-preserving
+   generated summary.
+4. Review the seven-item integrated-demo acceptance boundary.
+5. Recover the Stage 6 coexistence-matrix semantics without claiming to
    regenerate its missing producer artifact.
+
+## Integrated demo acceptance tracker
+
+| Requirement | Status | Evidence / remaining work |
+|---|---|---|
+| A3 LNC semantics and adapter | complete | Combined rank-8 affine spaces are normalized and compared against the rank-6 LC bases |
+| LC/LNC merge or association rule | complete | Combined space must imply LC; incremental rank records the added information without treating a complementary basis as unique |
+| Stage 2 configurable sample count and deterministic keys | complete-draft | A4 request controls `key_count` and uses `sha256-counter-v1`; total budget and formal/smoke request split remain |
+| Stage 3 fixed seed and unified probability result format | complete-draft | A5 v2 request/observation has deterministic sampling, finite budgets and completion-gated descriptive estimates |
+| Unified configuration and pipeline runner | not-started | Current stage requests and scripts are separate |
+| End-to-end small regression | not-started | Stage-level integrations exist, but no single A1-A5 orchestration regression exists |
+| Automatically generated result summary | partial | Each stage can summarize itself; no integrated cross-stage summary exists |
+| Final acceptance after all seven items are integrated | not-started | Depends on A4 hardening, runner, end-to-end regression and integrated summary |
 
 ## SAT baseline maintenance register
 
