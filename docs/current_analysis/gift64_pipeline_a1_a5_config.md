@@ -3,8 +3,8 @@
 > Defined locally: 2026-07-26
 >
 > Scope: compose the existing A1-A5 contracts into one validated smoke or
-> formal demo plan. This is a configuration boundary only; it does not yet run
-> stages or emit an integrated result summary.
+> formal demo plan. The corresponding runner executes it in dependency order;
+> this document records the configuration boundary.
 
 ## Result
 
@@ -31,8 +31,8 @@ and independently validated.
 
 ## Resolution rules
 
-Loading a pipeline plan validates all of the following before a future runner
-can begin execution:
+Loading a pipeline plan validates all of the following before the runner can
+begin execution:
 
 1. A1, A2 and A3 are all enabled; this is an A1-A5 integration plan, not a
    partial stage selector.
@@ -58,10 +58,10 @@ Tests cover canonical round-tripping, actual resolution of both tracked
 profiles, shared trail-position validation, profile sample-count validation,
 required A1-A3 stage activation, and path-traversal rejection.
 
-## Next boundary
+## Runner hand-off
 
-The next change is a pipeline runner that loads this plan, invokes A1 through
-A5 in dependency order, preserves each stage's structured summary, and stops
-with explicit cross-stage failure semantics. The runner must keep generated
-observations out of Git and must not upgrade the controlled demo into a
+The plan is consumed by
+[`gift64_pipeline_runner_a1_a5.md`](gift64_pipeline_runner_a1_a5.md). The
+runner preserves these composition checks and keeps generated observations out
+of Git; using the unified plan does not upgrade the controlled demo into a
 paper-level reproduction claim.

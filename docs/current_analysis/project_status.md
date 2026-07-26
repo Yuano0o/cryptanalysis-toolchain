@@ -13,7 +13,7 @@
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
 | Stage-contract schema design | in-progress | Solver, trail, TrailInformation, GF(2) `ConstraintSet`, space comparison, Stage 2 key corpus and bounded Stage 3 probability contracts are implemented; right-key contracts remain |
 | SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
-| Workstream A pipeline implementation | in-progress | Controlled SAT, TrailInformation, LC/LNC normalization, Stage 2 fixed-key and Stage 3 probability demos are complete; coexistence and later stages remain |
+| Workstream A pipeline implementation | in-progress | Controlled A1-A5 runner smoke completed; coexistence and later stages remain |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -46,11 +46,11 @@ Completed checkpoints:
 | `TrailInformation.out` parser | complete | A1 recovers 32 records, `[5,13)` rounds, round-4 key-state anchor and MSB-first order | Reuse as the normalized Stage 2 trail input | Exact trail selection/concatenation provenance is missing |
 | LC extraction adapter | complete | A2 observes pinned matrices, folds fixed constants and canonicalizes 32 rank-6 GF(2) spaces | Add independent derivation later | Current exactness is relative to pinned legacy source |
 | LNC extraction adapter | complete | A3 normalizes 32 combined rank-8 spaces; every LC base is implied with incremental rank 2 | Reuse the comparison boundary in Stage 2 reporting | Current exactness is relative to pinned legacy source |
-| Stage 2 fixed-key validation | complete-draft | A4 has deterministic key generation, source/trail pinning, explicit physical trail selection, smoke/formal request split, per-key and total budgets, total wall time, and unstarted-budget semantics separate from solver statuses | Integrate its formal request into the A1-A5 runner | Original million-key result remains blocked by missing provenance and no UNSAT proof is emitted |
+| Stage 2 fixed-key validation | complete-draft | A4 has deterministic key generation, source/trail pinning, explicit physical trail selection, smoke/formal request split, per-key and total budgets, total wall time, and unstarted-budget semantics separate from solver statuses | Run a selected formal profile only under its declared budget | Original million-key result remains blocked by missing provenance and no UNSAT proof is emitted |
 | Stage 3 probability | complete-draft | A5 has deterministic subcube sampling, source/fixture pinning, explicit key/trail positions, per-sample and total budgets, 64-bit complete-count checks and completion-gated descriptive estimates | Extend selected key/trail coverage under the declared total budget | Fixture generator/provenance is missing; no global exact/probability claim |
-| Unified demo runner | in-progress | `gift64-pipeline-demo-request/v1` composes validated smoke/formal A1-A5 plans; stages still have separate scripts | Implement runner in dependency order and define cross-stage failures | No integrated execution/summary yet |
-| End-to-end demo regression | not-started | Stage-level unit and integration tests pass independently | Add one small deterministic A1-A5 regression using smoke-sized inputs | No unified runner or integrated observation yet |
-| Integrated result summary | not-started | A1-A5 each expose structured or JSON-compatible summaries | Define one provenance-preserving pipeline summary | Cross-stage status and failure semantics are not yet defined |
+| Unified demo runner | complete-draft | Versioned runner composes the validated smoke/formal plan, passes A2 LC sets into A3, stops safely on stage failures and retains every native summary | Review integrated-demo acceptance, then recover coexistence semantics | Controlled demo only; missing provenance/proof boundary remains |
+| End-to-end demo regression | complete-draft | Smoke-sized A1-A5 integration test executes the real runner when the read-only source/compiler/solver dependencies are present | Keep it in the regression suite; review acceptance | Environment-dependent test is skipped where those dependencies are unavailable |
+| Integrated result summary | complete-draft | `gift64-pipeline-observation/v1` preserves configuration, source root, timing, cross-stage states and native stage summaries | Optionally add a presentation-oriented compact report | Structured demo output only, not a paper result |
 | Trail coexistence | ready-for-static-work | Code and matrix present | Recover matrix semantics | Matrix generator absent |
 | 18/19-round construction | blocked | Paper results known | Obtain/formalise extension construction | No generator/entry found |
 | Attack-level regression | blocked | Improved paper and two small source files present | Request missing enumeration/attack code | Public archive incomplete |
@@ -78,12 +78,8 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Implement an A1-A5 pipeline runner consuming the unified smoke/formal
-   configuration and define cross-stage failure semantics.
-2. Add a smoke-sized end-to-end regression and a provenance-preserving
-   generated summary.
-3. Review the seven-item integrated-demo acceptance boundary.
-4. Recover the Stage 6 coexistence-matrix semantics without claiming to
+1. Review the seven-item integrated-demo acceptance boundary.
+2. Recover the Stage 6 coexistence-matrix semantics without claiming to
    regenerate its missing producer artifact.
 
 ## Integrated demo acceptance tracker
@@ -94,10 +90,10 @@ Completed checkpoints:
 | LC/LNC merge or association rule | complete | Combined space must imply LC; incremental rank records the added information without treating a complementary basis as unique |
 | Stage 2 configurable sample count and deterministic keys | complete | A4 v2 has `sha256-counter-v1`, separate eight-key smoke and 1,000-key formal requests, finite total budget and explicit unstarted-budget results |
 | Stage 3 fixed seed and unified probability result format | complete-draft | A5 v2 request/observation has deterministic sampling, finite budgets and completion-gated descriptive estimates |
-| Unified configuration and pipeline runner | partial | Smoke/formal `gift64-pipeline-demo-request/v1` manifests validate common fixture identity, trail position and referenced A4/A5 request profiles; runner remains unimplemented |
-| End-to-end small regression | not-started | Stage-level integrations exist, but no single A1-A5 orchestration regression exists |
-| Automatically generated result summary | partial | Each stage can summarize itself; no integrated cross-stage summary exists |
-| Final acceptance after all seven items are integrated | not-started | Depends on A4 hardening, runner, end-to-end regression and integrated summary |
+| Unified configuration and pipeline runner | complete-draft | `gift64-pipeline-demo-request/v1` validates common fixture identity, shared trail position and A4/A5 profiles; `gift64-pipeline-runner/v1` executes it with explicit cross-stage failure semantics |
+| End-to-end small regression | complete-draft | One smoke-sized A1-A5 regression exercises the real runner when its locally documented dependencies are available |
+| Automatically generated result summary | complete-draft | `gift64-pipeline-observation/v1` emits one provenance-preserving structured summary to standard output without tracking generated output |
+| Final acceptance after all seven items are integrated | in-progress | Seven component-level boundaries are implemented; acceptance review must confirm their joint claim boundary before marking it complete |
 
 ## SAT baseline maintenance register
 
@@ -166,4 +162,8 @@ The authoritative details and completion evidence are in
   keys within its 120-second budget.
 - 2026-07-26: defined `gift64-pipeline-demo-request/v1` smoke and formal A1-A5
   manifests, including shared fixture/trail identity and validated A4/A5
-  profile composition; no unified runner or integrated observation exists yet.
+  profile composition.
+- 2026-07-26: implemented `gift64-pipeline-runner/v1`, including dependency
+  order, A2-to-A3 LC-space hand-off, explicit terminal/skip states and
+  `gift64-pipeline-observation/v1`; the real smoke profile completed all A1-A5
+  stages locally in 4.65 seconds.

@@ -99,16 +99,15 @@ through explicit, versioned boundaries:
 | A4 | Deterministic generated-key Stage 2 demo with explicit trail position and native per-key statuses | [A4 details](docs/current_analysis/gift64_stage2_a4.md) |
 | A5 | Seeded, budgeted Stage 3 subcube counting with completion-gated descriptive probability output | [A5 details](docs/current_analysis/gift64_stage3_a5.md) |
 | A1-A5 config | Validated smoke/formal manifest binds the shared fixture/trail and referenced A4/A5 requests | [Configuration details](docs/current_analysis/gift64_pipeline_a1_a5_config.md) |
+| A1-A5 runner | One dependency-ordered smoke/formal entry point with explicit failure/skip states and a generated structured summary | [Runner details](docs/current_analysis/gift64_pipeline_runner_a1_a5.md) |
 
-These checkpoints support a non-paper-reproduction demo. The missing original
-`KeyCandidate.out`, trail-generation provenance and proof-producing `UNSAT`
-workflow still limit stronger claims.
+The smoke runner has completed once locally across A1-A5. It is a controlled
+demo, not a paper reproduction; the missing original `KeyCandidate.out`,
+trail-generation provenance and proof-producing `UNSAT` workflow remain
+material limits.
 
-**Next step:** implement the A1-A5 pipeline runner using the unified
-configuration, then add an end-to-end regression and generated summary. Only
-after that integration
-boundary passes should the project record the seven-item demo acceptance and
-move to coexistence-matrix semantics. See
+**Next step:** review the seven-item integrated-demo acceptance boundary, then
+recover the coexistence-matrix semantics. See
 [project status](docs/current_analysis/project_status.md) for the acceptance
 tracker and [materials status](docs/current_analysis/materials_status.md) for
 paper-reproduction blockers.
