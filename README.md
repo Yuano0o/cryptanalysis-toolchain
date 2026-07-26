@@ -85,9 +85,10 @@ reproduction or a general performance claim. See
 [project status](docs/current_analysis/project_status.md) for current progress,
 maintenance items, blockers and the next action.
 
-**Next step:** complete the bounded A2 LC `ConstraintSet` boundary against the
-supplied corpus. Missing generation provenance and `KeyCandidate.out` continue
-to block paper-level Stage 2 reproduction; see
+**Next step:** define a deterministic `generated-for-demo` key-corpus contract
+and a bounded Stage 2 adapter with explicit trail selection. The missing
+original `KeyCandidate.out` continues to block paper-level Stage 2
+reproduction, but it does not block the controlled demo; see
 [materials status](docs/current_analysis/materials_status.md).
 
 ## Current Update — GIFT-64 Pipeline A1
@@ -125,6 +126,19 @@ supplementary linear-constraint figure. This is exact reproduction of the
 pinned legacy matrix output, not yet an independent proof of the LC algorithm.
 See
 [`docs/current_analysis/gift64_linear_constraints_a2.md`](docs/current_analysis/gift64_linear_constraints_a2.md).
+
+## Current Update — GIFT-64 Pipeline A3
+
+The linearised-constraint stage now has a structured combined-space boundary.
+Its legacy output is correctly represented as
+`LC_PLUS_LINEARIZED_RELATIONS`, rather than as eight wholly new LNC equations,
+and is compared algebraically against each A2 LC base.
+
+Across all 32 positional trails, the combined spaces have rank 8, imply the
+corresponding rank-6 LC spaces and add incremental rank 2. The comparison is
+recorded through `constraint-space-comparison/v1`; a particular complementary
+equation basis is not treated as unique semantics. See
+[`docs/current_analysis/gift64_linearized_constraints_a3.md`](docs/current_analysis/gift64_linearized_constraints_a3.md).
 
 ## Planned Evaluation
 

@@ -20,7 +20,9 @@ The current workspace is sufficient to:
   corpus through a versioned contract;
 - reproduce and normalize the pinned LC program's equations through a
   versioned GF(2) contract;
-- statically recover the LNC representation before extending that contract;
+- reproduce and normalize the pinned LNC-stage combined spaces and compare
+  them algebraically against the LC bases;
+- generate a new deterministic key corpus for a controlled Stage 2 demo;
 - build small parser and verifier fixtures that do not invoke a solver.
 
 It is not sufficient to reproduce the complete GIFT differential-level paper.
@@ -55,6 +57,7 @@ It is not sufficient to reproduce the complete GIFT differential-level paper.
 | Trail selection/group manifest | missing-nonblocking | Producer handles one `GroupIndex`; bundled corpus contains eight positional groups in a different order | Exact regeneration of the 32-trail fixture | Obtain commands, seeds, selection rule and position-to-`GroupIndex` map |
 | LC equations and supplement | available | Pinned LC source; one-page eight-set PDF; `constraint-set/v1` observation yields 32 rank-6 spaces | Structured Stage 1 LC boundary | Add an independent derivation after LNC semantics are stable |
 | Independent LC derivation | missing-nonblocking | Current adapter exactly observes legacy matrices but does not independently recompute them | Stronger algorithmic verification | Reimplement/test DDT affine spaces and elimination separately |
+| LNC-stage equations | available | Pinned LNC source; combined `constraint-set/v1` spaces yield rank 8 and imply every rank-6 LC base with incremental rank 2 | Structured linearised-relation boundary | Add an independent `DDTInOutRelation` derivation later |
 | `KeyCandidate1000.out` | available | Included in GIFT stage 5 | Stage 3 input fixture | Recover format and provenance limitations |
 | `KeyCandidate.out` | missing-blocking | Referenced by stage 4, not included | Paper-level Stage 2 reproduction | Obtain generator, distribution, seed and hash |
 | `AllMatrix33Trail.out` | partial | Included in GIFT stage 6 | Coexistence input fixture | Generator and semantic schema are missing |
