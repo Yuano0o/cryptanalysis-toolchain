@@ -49,6 +49,9 @@ These files reflect the latest full workspace and paper scan:
   recovered LC matrix/round-constant semantics, versioned GF(2)
   `ConstraintSet`, semantic affine-space hashing and bounded equivalence
   evidence.
+- [gift64_linearized_constraints_a3.md](current_analysis/gift64_linearized_constraints_a3.md):
+  recovered global LNC-stage semantics, combined LC-plus-linearised spaces,
+  exact LC implication and incremental-rank evidence.
 
 ### Prior planning
 

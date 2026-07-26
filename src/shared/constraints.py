@@ -11,6 +11,9 @@ from typing import Any, Mapping
 
 
 CONSTRAINT_SET_SCHEMA_VERSION = "constraint-set/v1"
+CONSTRAINT_SPACE_COMPARISON_SCHEMA_VERSION = (
+    "constraint-space-comparison/v1"
+)
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -21,6 +24,7 @@ class ConstraintValidationError(ValueError):
 class ConstraintKind(str, Enum):
     LC = "LC"
     LNC = "LNC"
+    LC_PLUS_LINEARIZED_RELATIONS = "LC_plus_linearized_relations"
     ADDITIONAL_EXACT = "additional_exact_constraint"
     UNCATEGORISED_NONLINEAR = "uncategorised_nonlinear_constraint"
 
@@ -397,6 +401,19 @@ class ConstraintSet:
             and self.semantic_sha256 == other.semantic_sha256
         )
 
+    def implies(self, other: ConstraintSet) -> bool:
+        """Return whether every solution of this set satisfies ``other``."""
+
+        _validate_comparable_constraint_spaces(self, other)
+        try:
+            combined_rows = canonicalize_gf2_equations(
+                self.equations + other.equations,
+                self.variable_count,
+            )
+        except ConstraintValidationError:
+            return False
+        return len(combined_rows) == self.rank
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema_version": self.schema_version,
@@ -512,3 +529,218 @@ class ConstraintSet:
                 "constraint-set JSON is invalid"
             ) from exc
         return cls.from_dict(data)
+
+
+def _validate_comparable_constraint_spaces(
+    first: ConstraintSet,
+    second: ConstraintSet,
+) -> None:
+    if not isinstance(first, ConstraintSet) or not isinstance(
+        second, ConstraintSet
+    ):
+        raise ConstraintValidationError(
+            "constraint-space comparison requires ConstraintSet values"
+        )
+    comparable_fields = (
+        "field",
+        "cipher",
+        "variable_order_id",
+        "variable_count",
+        "source_artifact_sha256",
+        "source_group_position",
+        "source_trail_position",
+        "source_round_start",
+        "source_round_end",
+    )
+    mismatches = [
+        field_name
+        for field_name in comparable_fields
+        if getattr(first, field_name) != getattr(second, field_name)
+    ]
+    if mismatches:
+        raise ConstraintValidationError(
+            "constraint spaces have incompatible metadata: "
+            + ", ".join(mismatches)
+        )
+
+
+@dataclass(frozen=True)
+class ConstraintSpaceComparison:
+    """Stable algebraic relationship between a base and combined space."""
+
+    schema_version: str
+    source_artifact_sha256: str
+    source_group_position: int
+    source_trail_position: int
+    base_constraint_set_id: str
+    combined_constraint_set_id: str
+    base_semantic_sha256: str
+    combined_semantic_sha256: str
+    base_rank: int
+    combined_rank: int
+    base_implied_by_combined: bool
+    incremental_rank: int | None
+
+    def __post_init__(self) -> None:
+        if (
+            self.schema_version
+            != CONSTRAINT_SPACE_COMPARISON_SCHEMA_VERSION
+        ):
+            raise ConstraintValidationError(
+                "unsupported constraint-space comparison schema version"
+            )
+        _require_sha256(
+            self.source_artifact_sha256,
+            "comparison.source_artifact_sha256",
+        )
+        _require_nonnegative_integer(
+            self.source_group_position,
+            "comparison.source_group_position",
+        )
+        _require_nonnegative_integer(
+            self.source_trail_position,
+            "comparison.source_trail_position",
+        )
+        _require_nonempty(
+            self.base_constraint_set_id,
+            "comparison.base_constraint_set_id",
+        )
+        _require_nonempty(
+            self.combined_constraint_set_id,
+            "comparison.combined_constraint_set_id",
+        )
+        _require_sha256(
+            self.base_semantic_sha256,
+            "comparison.base_semantic_sha256",
+        )
+        _require_sha256(
+            self.combined_semantic_sha256,
+            "comparison.combined_semantic_sha256",
+        )
+        _require_nonnegative_integer(
+            self.base_rank, "comparison.base_rank"
+        )
+        _require_nonnegative_integer(
+            self.combined_rank, "comparison.combined_rank"
+        )
+        if not isinstance(self.base_implied_by_combined, bool):
+            raise ConstraintValidationError(
+                "comparison.base_implied_by_combined must be a Boolean"
+            )
+        if self.incremental_rank is not None:
+            _require_nonnegative_integer(
+                self.incremental_rank,
+                "comparison.incremental_rank",
+            )
+        expected_incremental_rank = (
+            self.combined_rank - self.base_rank
+            if self.base_implied_by_combined
+            else None
+        )
+        if self.incremental_rank != expected_incremental_rank:
+            raise ConstraintValidationError(
+                "comparison.incremental_rank is inconsistent"
+            )
+        if self.base_implied_by_combined and self.combined_rank < self.base_rank:
+            raise ConstraintValidationError(
+                "an implying combined space cannot have lower rank"
+            )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "source_artifact_sha256": self.source_artifact_sha256,
+            "source_group_position": self.source_group_position,
+            "source_trail_position": self.source_trail_position,
+            "base_constraint_set_id": self.base_constraint_set_id,
+            "combined_constraint_set_id": self.combined_constraint_set_id,
+            "base_semantic_sha256": self.base_semantic_sha256,
+            "combined_semantic_sha256": self.combined_semantic_sha256,
+            "base_rank": self.base_rank,
+            "combined_rank": self.combined_rank,
+            "base_implied_by_combined": self.base_implied_by_combined,
+            "incremental_rank": self.incremental_rank,
+        }
+
+    def to_json(self) -> str:
+        return json.dumps(
+            self.to_dict(),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        ) + "\n"
+
+    @classmethod
+    def from_dict(cls, value: Any) -> ConstraintSpaceComparison:
+        data = _expect_mapping(value, "constraint_space_comparison")
+        _expect_keys(
+            data,
+            {
+                "schema_version",
+                "source_artifact_sha256",
+                "source_group_position",
+                "source_trail_position",
+                "base_constraint_set_id",
+                "combined_constraint_set_id",
+                "base_semantic_sha256",
+                "combined_semantic_sha256",
+                "base_rank",
+                "combined_rank",
+                "base_implied_by_combined",
+                "incremental_rank",
+            },
+            "constraint_space_comparison",
+        )
+        return cls(
+            schema_version=data["schema_version"],
+            source_artifact_sha256=data["source_artifact_sha256"],
+            source_group_position=data["source_group_position"],
+            source_trail_position=data["source_trail_position"],
+            base_constraint_set_id=data["base_constraint_set_id"],
+            combined_constraint_set_id=(
+                data["combined_constraint_set_id"]
+            ),
+            base_semantic_sha256=data["base_semantic_sha256"],
+            combined_semantic_sha256=data["combined_semantic_sha256"],
+            base_rank=data["base_rank"],
+            combined_rank=data["combined_rank"],
+            base_implied_by_combined=data["base_implied_by_combined"],
+            incremental_rank=data["incremental_rank"],
+        )
+
+    @classmethod
+    def from_json(cls, value: str) -> ConstraintSpaceComparison:
+        try:
+            data = json.loads(value)
+        except json.JSONDecodeError as exc:
+            raise ConstraintValidationError(
+                "constraint-space comparison JSON is invalid"
+            ) from exc
+        return cls.from_dict(data)
+
+
+def compare_constraint_spaces(
+    *,
+    base: ConstraintSet,
+    combined: ConstraintSet,
+) -> ConstraintSpaceComparison:
+    """Compare a combined affine space against its required base space."""
+
+    _validate_comparable_constraint_spaces(base, combined)
+    base_implied = combined.implies(base)
+    return ConstraintSpaceComparison(
+        schema_version=CONSTRAINT_SPACE_COMPARISON_SCHEMA_VERSION,
+        source_artifact_sha256=base.source_artifact_sha256,
+        source_group_position=base.source_group_position,
+        source_trail_position=base.source_trail_position,
+        base_constraint_set_id=base.constraint_set_id,
+        combined_constraint_set_id=combined.constraint_set_id,
+        base_semantic_sha256=base.semantic_sha256,
+        combined_semantic_sha256=combined.semantic_sha256,
+        base_rank=base.rank,
+        combined_rank=combined.rank,
+        base_implied_by_combined=base_implied,
+        incremental_rank=(
+            combined.rank - base.rank if base_implied else None
+        ),
+    )
