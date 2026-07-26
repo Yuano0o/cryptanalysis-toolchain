@@ -144,7 +144,7 @@ comparable performance baselines without rerunning the same instance.
 | B4 Compile and smoke solve | complete | CryptoMiniSat 5.14.7 compiled and ran the unchanged legacy source |
 | B5 Decode and validate | complete | Controlled SAT model independently passes all checks |
 | B6 Regression capture | complete | Stable validated summary recorded |
-| B7 Controlled comparison | deferred | At least one alternative configuration compared fairly |
+| B7 Controlled comparison | complete | Alternating 1-thread/2-thread comparison preserves verified semantics |
 
 ## B2 result
 
@@ -225,12 +225,12 @@ binary or machine-specific path.
 
 ## Immediate next implementation
 
-The minimal SAT baseline B0-B6 is complete. Begin Workstream A implementation
-with the `TrailInformation.out` parser/schema boundary, then define LC/LNC
-constraint contracts. B7 controlled performance/configuration comparison
-remains deferred.
+The minimal SAT baseline B0-B7 is complete. The next substantive decision is
+whether the missing GIFT differential-level materials are sufficient for a
+bounded pipeline study; do not treat B7 as a paper-level performance result.
 
 B3-B6 details are in [sat_baseline_b3.md](sat_baseline_b3.md),
 [sat_baseline_b4.md](sat_baseline_b4.md) and
 [sat_baseline_b5.md](sat_baseline_b5.md) and
-[sat_baseline_b6.md](sat_baseline_b6.md).
+[sat_baseline_b6.md](sat_baseline_b6.md) and
+[sat_baseline_b7.md](sat_baseline_b7.md).

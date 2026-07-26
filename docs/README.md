@@ -37,6 +37,8 @@ These files reflect the latest full workspace and paper scan:
 - [sat_baseline_b6.md](current_analysis/sat_baseline_b6.md): normalized semantic
   regression expectation, non-deterministic-field policy and temporary
   end-to-end checker for checkpoint B6.
+- [sat_baseline_b7.md](current_analysis/sat_baseline_b7.md): bounded alternating
+  one-thread/two-thread comparison and its reproducibility limits.
 
 ### Prior planning
 

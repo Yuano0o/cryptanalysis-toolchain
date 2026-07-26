@@ -12,8 +12,8 @@
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
 | Stage-contract schema design | in-progress | Solver contracts and `TrailRecord` implemented and exercised; later-stage contracts remain drafts |
-| SAT baseline | complete | B0-B6 pass; B7 performance/configuration comparison is deferred |
-| Workstream A pipeline implementation | in-progress | First controlled SAT adapter is complete; differential-level stages are not implemented |
+| SAT baseline | complete | B0-B7 pass; B7 is a local descriptive thread comparison, not a server benchmark |
+| Workstream A pipeline implementation | deferred | Supplementary material gaps must be resolved before formal pipeline implementation resumes |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -41,7 +41,7 @@ Completed checkpoints:
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
 | Common artifact contracts | in-progress | Solver contracts and minimal versioned `TrailRecord` implemented; later-stage fields remain specified drafts | Extend `TrailRecord` only when parser/model decoding requires it | Later representation choices need validation |
-| SAT trail search boundary | complete | B1-B6 pass; normalized regression requires verified `SAT` with components `11`/`1` | Preserve while building the next pipeline stage | None for the four-round baseline |
+| SAT trail search boundary | complete | B1-B7 pass; 1-thread/2-thread comparison preserves verified `SAT` with components `11`/`1` | Preserve baseline and revisit only with a defined instance suite | No baseline blocker |
 | `TrailInformation.out` parser | ready | Inputs available | Recover exact token boundaries and ordering | None |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
@@ -74,8 +74,9 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Recover and implement the `TrailInformation.out` schema/parser boundary.
-2. Define LC/LNC constraint contracts against parsed trails.
+1. Resolve the missing GIFT pipeline materials and choose a bounded formal
+   pipeline target.
+2. Keep A1/A2 exploratory work frozen until that decision is recorded.
 
 ## Change log
 
@@ -98,3 +99,6 @@ Completed checkpoints:
 - 2026-07-26: completed B6 with a normalized semantic expectation and
   temporary-artifact end-to-end checker; status, objective and verification are
   hard requirements while runtime and the uncontrolled-seed model hash are not.
+- 2026-07-26: completed B7 locally with alternating five-repeat 1-thread versus
+  2-thread runs; both configurations remained independently verified SAT, while
+  the observed local median comparison is descriptive only.

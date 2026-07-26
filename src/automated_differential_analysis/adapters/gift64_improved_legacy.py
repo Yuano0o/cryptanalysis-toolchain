@@ -41,6 +41,7 @@ EXPECTED_SOURCE_SHA256 = (
 )
 STATUS_PREFIX = "LGCA_SOLVER_STATUS="
 _SOLVE_LINE = "    lbool ret = solver.solve();"
+_THREAD_LINE = "    solver.set_num_threads(1);"
 _ROUND_HEADER_RE = re.compile(r"^Round:\s+([0-9]+)\s+-+\s*$")
 _SOLVER_VERSION_RE = re.compile(r"CryptoMiniSat version ([0-9][0-9.]*)")
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -76,8 +77,8 @@ def _sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
-def instrument_status_output(source: bytes) -> bytes:
-    """Return a temporary source copy with an explicit lbool status marker."""
+def instrument_status_output(source: bytes, *, threads: int = 1) -> bytes:
+    """Return a temporary copy with an explicit status and optional threads."""
 
     digest = _sha256_bytes(source)
     if digest != EXPECTED_SOURCE_SHA256:
@@ -90,9 +91,22 @@ def instrument_status_output(source: bytes) -> bytes:
         raise Gift64LegacyAdapterError(
             "expected exactly one pinned solver.solve() instrumentation point"
         )
-    return text.replace(
+    if isinstance(threads, bool) or not isinstance(threads, int) or threads <= 0:
+        raise Gift64LegacyAdapterError("thread count must be a positive integer")
+    instrumented = text.replace(
         _SOLVE_LINE, _STATUS_INSTRUMENTATION, 1
-    ).encode("utf-8")
+    )
+    if threads != 1:
+        if instrumented.count(_THREAD_LINE) != 1:
+            raise Gift64LegacyAdapterError(
+                "expected exactly one pinned solver thread configuration"
+            )
+        instrumented = instrumented.replace(
+            _THREAD_LINE,
+            f"    solver.set_num_threads({threads});",
+            1,
+        )
+    return instrumented.encode("utf-8")
 
 
 def parse_status_marker(stderr: str) -> SolverStatus:
@@ -316,10 +330,6 @@ def _validate_environment(
             "CryptoMiniSat version mismatch: "
             f"request {request.solver.version}, installed {installed_version}"
         )
-    if request.solver.threads != 1:
-        raise Gift64LegacyAdapterError(
-            "pinned legacy source supports only its hard-coded single thread"
-        )
 
 
 def run_controlled_gift64(
@@ -345,7 +355,9 @@ def run_controlled_gift64(
                 "request must define a positive solver time limit"
             )
         source = source_path.read_bytes()
-        instrumented = instrument_status_output(source)
+        instrumented = instrument_status_output(
+            source, threads=request.solver.threads
+        )
         artifact_root.mkdir(parents=True, exist_ok=True)
         compiler_path = shutil.which(compiler)
         if compiler_path is None:
@@ -493,6 +505,7 @@ def run_controlled_gift64(
             "request_seed": request.seed,
             "seed_application": "solver default; not explicit in legacy source",
             "source_instrumented_temporarily": True,
+            "thread_override_from_legacy_source": request.solver.threads != 1,
             "threads": request.solver.threads,
         }
         if solved.returncode != 0:

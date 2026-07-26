@@ -60,7 +60,7 @@ candidate space
   → verified result
 ```
 
-## Current Update — SAT Baseline B1-B6
+## Current Update — SAT Baseline B1-B7
 
 The first six baseline checkpoints are complete. B1 maps the four-round
 GIFT-64 differential program from the Improved Attacks reference source without
@@ -102,6 +102,13 @@ status, objective components, verification and exact-label result while
 ignoring runtime and local paths. The observed model hash is provenance-only
 until the legacy seed is explicitly controlled. The real end-to-end B6 check
 passes without retaining generated artifacts.
+
+B7 compares the same pinned four-round instance with one and two
+CryptoMiniSat threads, in alternating order across five repetitions. Both
+configurations remain independently verified `SAT` with components `11` and
+`1`; the observed local median is descriptive only, because the legacy source
+does not set an explicit solver seed. See
+[`docs/current_analysis/sat_baseline_b7.md`](docs/current_analysis/sat_baseline_b7.md).
 
 This is an infrastructure and regression baseline, not a reproduction of the
 full Improved Attacks paper. See

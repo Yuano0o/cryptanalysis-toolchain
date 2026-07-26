@@ -77,6 +77,25 @@ class Gift64LegacyInstrumentationTests(unittest.TestCase):
         ):
             instrument_status_output(SYNTHETIC_SOURCE)
 
+    def test_nondefault_threads_require_a_pinned_thread_line(self) -> None:
+        source = b"""int main()
+{
+    solver.set_num_threads(1);
+    lbool ret = solver.solve();
+}
+"""
+        expected_sha256 = hashlib.sha256(source).hexdigest()
+
+        with patch(
+            "automated_differential_analysis.adapters."
+            "gift64_improved_legacy.EXPECTED_SOURCE_SHA256",
+            expected_sha256,
+        ):
+            instrumented = instrument_status_output(source, threads=2)
+
+        self.assertIn(b"solver.set_num_threads(2);", instrumented)
+        self.assertIn(b"LGCA_SOLVER_STATUS=", instrumented)
+
     def test_status_marker_requires_exactly_one_native_status(self) -> None:
         self.assertEqual(
             parse_status_marker("LGCA_SOLVER_STATUS=SAT\n"),
