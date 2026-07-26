@@ -15,6 +15,7 @@ from .gift64_trail_information import (
 )
 from .gift64_stage2_key_corpus import (
     GIFT64_STAGE2_DEMO_GENERATOR_ID,
+    GIFT64_STAGE2_MAX_DEMO_KEY_COUNT,
     GIFT64_STAGE2_DEMO_PURPOSE,
     GIFT64_STAGE2_KEY_CORPUS_SCHEMA_VERSION,
     Gift64Stage2KeyCorpusError,
@@ -33,6 +34,7 @@ from .gift64_stage2_demo_request import (
     load_gift64_stage2_demo_request,
 )
 from .gift64_pipeline_demo import (
+    GIFT64_PIPELINE_COMPOSITION_MODE,
     GIFT64_PIPELINE_DEMO_SCHEMA_VERSION,
     GIFT64_SUPPLEMENTARY_SOURCE_LAYOUT_ID,
     Gift64PipelineDemoConfig,
@@ -64,6 +66,7 @@ __all__ = [
     "parse_gift64_trail_information",
     "parse_gift64_trail_information_bytes",
     "GIFT64_STAGE2_DEMO_GENERATOR_ID",
+    "GIFT64_STAGE2_MAX_DEMO_KEY_COUNT",
     "GIFT64_STAGE2_DEMO_PURPOSE",
     "GIFT64_STAGE2_KEY_CORPUS_SCHEMA_VERSION",
     "Gift64Stage2KeyCorpusError",
@@ -79,6 +82,7 @@ __all__ = [
     "Gift64Stage2DemoRequestError",
     "load_gift64_stage2_demo_request",
     "GIFT64_PIPELINE_DEMO_SCHEMA_VERSION",
+    "GIFT64_PIPELINE_COMPOSITION_MODE",
     "GIFT64_SUPPLEMENTARY_SOURCE_LAYOUT_ID",
     "Gift64PipelineDemoConfig",
     "Gift64PipelineDemoError",

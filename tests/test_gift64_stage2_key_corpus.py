@@ -7,6 +7,7 @@ from automated_differential_analysis.formats import (
     GIFT64_STAGE2_DEMO_GENERATOR_ID,
     GIFT64_STAGE2_DEMO_PURPOSE,
     GIFT64_STAGE2_KEY_CORPUS_SCHEMA_VERSION,
+    GIFT64_STAGE2_MAX_DEMO_KEY_COUNT,
     Gift64Stage2KeyCorpusError,
     Gift64Stage2KeyCorpusSpec,
     generate_stage2_key_corpus,
@@ -82,6 +83,12 @@ class Gift64Stage2KeyCorpusTests(unittest.TestCase):
                 0,
                 1,
             )
+
+    def test_spec_rejects_key_count_above_demo_resource_bound(self) -> None:
+        with self.assertRaisesRegex(
+            Gift64Stage2KeyCorpusError, "bounded demo maximum"
+        ):
+            demo_spec(key_count=GIFT64_STAGE2_MAX_DEMO_KEY_COUNT + 1)
 
 
 if __name__ == "__main__":

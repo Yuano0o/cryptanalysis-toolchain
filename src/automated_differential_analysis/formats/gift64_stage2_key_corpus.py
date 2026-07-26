@@ -18,6 +18,7 @@ from typing import Any
 GIFT64_STAGE2_KEY_CORPUS_SCHEMA_VERSION = "gift64-stage2-key-corpus/v1"
 GIFT64_STAGE2_DEMO_GENERATOR_ID = "sha256-counter-v1"
 GIFT64_STAGE2_DEMO_PURPOSE = "generated-for-demo"
+GIFT64_STAGE2_MAX_DEMO_KEY_COUNT = 100_000
 _WORD_RE = re.compile(r"^[0-9a-fA-F]{4}$")
 _DOMAIN_SEPARATOR = b"lgca/gift64-stage2-key-corpus/v1\x00"
 
@@ -80,6 +81,11 @@ class Gift64Stage2KeyCorpusSpec:
         if self.seed >= 2**64:
             raise Gift64Stage2KeyCorpusError("key_corpus.seed must fit in 64 bits")
         _require_positive_int(self.key_count, "key_corpus.key_count")
+        if self.key_count > GIFT64_STAGE2_MAX_DEMO_KEY_COUNT:
+            raise Gift64Stage2KeyCorpusError(
+                "key_corpus.key_count exceeds the bounded demo maximum "
+                f"of {GIFT64_STAGE2_MAX_DEMO_KEY_COUNT}"
+            )
 
     def to_dict(self) -> dict[str, str | int]:
         return {

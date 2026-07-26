@@ -9,33 +9,44 @@
 ## Result
 
 `src/automated_differential_analysis/pipeline_runner.py` consumes a validated
-`gift64-pipeline-demo-request/v1` plan, runs A1 through A5 in dependency order
-and emits `gift64-pipeline-observation/v1`. The command-line entry point is
-`scripts/run_gift64_pipeline_demo.py`.
+`gift64-pipeline-demo-request/v2` plan, runs the A1-A5 controlled boundary
+orchestration and emits `gift64-pipeline-observation/v2`. The command-line
+entry point is `scripts/run_gift64_pipeline_demo.py`.
 
 The runner retains each native stage summary under its matching `a1` through
-`a5` entry. It records the configuration, read-only source root, per-stage and
-total wall time, terminal state, and a claim boundary in one JSON document.
+`a5` entry. It records the resolved pipeline/A4/A5 requests, composition mode,
+read-only source root, per-stage and total wall time, execution state, result
+state, and a claim boundary in one JSON document.
 It writes that document to standard output only: it does not create or track a
 result artifact in the repository.
 
 ## Stage and failure semantics
 
-| Stage | Runner input | Dependency use |
+| Stage | Runner input | Relationship |
 |---|---|---|
 | A1 | hash-pinned `TrailInformation.out` | parses the 32-record corpus |
 | A2 | LC source and A1 fixture | observes canonical LC spaces |
 | A3 | LNC source and A1 fixture | receives the A2 LC constraint sets |
-| A4 | Stage 2 source, fixture and referenced request | runs the deterministic generated-key corpus |
-| A5 | Stage 3 source, fixture, supplied key fixture and referenced request | runs seeded subcube samples |
+| A4 | Stage 2 source, fixture and referenced request | independently runs the deterministic generated-key demo corpus |
+| A5 | Stage 3 source, fixture, supplied key fixture and referenced request | independently runs seeded samples; the key fixture is not an A4 output |
 
-An `OSError` or validation error from a stage marks that stage `failed` and
-marks every later stage `not_run_upstream_failure`. A skipped stage is never
-reported as a solver status or cryptanalytic outcome. A fully successful run
-has five `completed` stages; the process exits with code 0. A started but
-failed pipeline (including a missing stage input) still prints its structured
-observation and exits with code 1; an invalid plan or runner invocation exits
-with code 2.
+A stage now has two independent classifications:
+
+- `state` describes execution: `completed`, `failed`, or
+  `not_run_upstream_failure`;
+- `result_state` describes analytical completeness: `complete`, `incomplete`,
+  `inconclusive`, or `not_available`.
+
+Validation, I/O and expected subprocess failures mark the stage `failed` and
+all later stages `not_run_upstream_failure`. Native A4/A5 `ERROR`, `TIMEOUT`
+or total-budget unstarted records instead preserve `state: completed` while
+setting `result_state: incomplete`; native `UNKNOWN` produces
+`inconclusive`. A5 is complete only when every sample is complete and its
+estimate exists. Skipped work is never counted as a solver status.
+
+The process exits 0 only when both pipeline execution and result are complete.
+A structured failed, incomplete or inconclusive observation exits 1. An
+invalid plan or runner invocation exits 2.
 
 ## Run commands
 
@@ -54,8 +65,9 @@ layout, `clang++`, and the locally configured CryptoMiniSat environment.
 
 ## Local smoke evidence
 
-On 2026-07-26, the smoke command completed all five stages in 4.65 seconds of
-reported pipeline wall time. Its summary reported A1's 32 records, A2 rank 6,
+After the joint-review hardening on 2026-07-26, the smoke command completed all
+five stages with `state: completed`, `result_state: complete` and exit code 0
+in 4.12 seconds of reported pipeline wall time. Its summary reported A1's 32 records, A2 rank 6,
 A3 combined rank 8 with all LC bases implied, eight A4 outcomes, and eight
 complete A5 samples. These values demonstrate interface composition only; the
 small key/sample budgets and non-proof-producing solver workflow prohibit a
@@ -64,5 +76,8 @@ paper-level probability, right-key-space or `UNSAT` claim.
 ## Validation
 
 `tests/test_gift64_pipeline_runner.py` covers ordered hand-off, the A2-to-A3
-constraint-set dependency, failure propagation, and a smoke-sized end-to-end
-run when the read-only source, compiler and solver environment are available.
+constraint-set dependency, execution/result-state separation, subprocess
+failure propagation, and a smoke-sized end-to-end run when the read-only
+source, compiler and solver environment are available.
+
+The post-hardening complete suite contains 106 passing tests.

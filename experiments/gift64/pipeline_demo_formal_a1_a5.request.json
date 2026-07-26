@@ -1,7 +1,8 @@
 {
+  "composition_mode": "controlled-boundary-orchestration/v1",
   "profile": "formal",
   "request_id": "gift64-a1-a5-formal-trail-position-0",
-  "schema_version": "gift64-pipeline-demo-request/v1",
+  "schema_version": "gift64-pipeline-demo-request/v2",
   "stages": {
     "a1": {
       "enabled": true

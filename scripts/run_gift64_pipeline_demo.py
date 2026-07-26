@@ -56,7 +56,12 @@ def main() -> int:
         print(f"GIFT-64 pipeline demo failed to start: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(observation.summary_dict(), ensure_ascii=True, indent=2, sort_keys=True))
-    return 0 if observation.state == "completed" else 1
+    return (
+        0
+        if observation.state == "completed"
+        and observation.result_state == "complete"
+        else 1
+    )
 
 
 if __name__ == "__main__":

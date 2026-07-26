@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 import shutil
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -15,6 +16,7 @@ from automated_differential_analysis.adapters.gift64_stage2_legacy import (
     parse_stage2_status_marker,
     run_gift64_stage2_demo,
 )
+from automated_differential_analysis.adapters import gift64_stage2_legacy
 from automated_differential_analysis.formats import Gift64Stage2KeyCorpusSpec
 from shared.sat import SolverStatus
 
@@ -40,6 +42,35 @@ STAGE2_ROOT = (
 
 
 class Gift64Stage2AdapterTests(unittest.TestCase):
+    def test_compile_guard_is_not_misreported_as_total_budget(self) -> None:
+        self.assertFalse(
+            gift64_stage2_legacy._compile_timeout_exhausted_total_budget(
+                120.0
+            )
+        )
+        self.assertTrue(
+            gift64_stage2_legacy._compile_timeout_exhausted_total_budget(
+                30.0
+            )
+        )
+
+    def test_homebrew_timeout_is_wrapped_as_adapter_error(self) -> None:
+        with (
+            patch(
+                "automated_differential_analysis.adapters."
+                "gift64_stage2_legacy.shutil.which",
+                return_value="/opt/homebrew/bin/brew",
+            ),
+            patch(
+                "automated_differential_analysis.adapters."
+                "gift64_stage2_legacy.subprocess.run",
+                side_effect=subprocess.TimeoutExpired("brew --prefix", 30),
+            ),
+        ):
+            with self.assertRaisesRegex(
+                Gift64Stage2AdapterError, "timed out resolving"
+            ):
+                gift64_stage2_legacy._formula_prefix("cryptominisat")
 
     def test_total_budget_skips_are_not_solver_statuses(self) -> None:
         skipped = Gift64Stage2KeyResult(

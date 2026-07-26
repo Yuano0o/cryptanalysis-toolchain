@@ -3,15 +3,16 @@
 > Defined locally: 2026-07-26
 >
 > Scope: compose the existing A1-A5 contracts into one validated smoke or
-> formal demo plan. The corresponding runner executes it in dependency order;
-> this document records the configuration boundary.
+> formal demo plan. The corresponding runner executes a controlled boundary
+> orchestration; this document records the configuration and lineage boundary.
 
 ## Result
 
-`gift64-pipeline-demo-request/v1` is the single entry manifest for the
+`gift64-pipeline-demo-request/v2` is the single entry manifest for the
 controlled A1-A5 demo. It records:
 
 - one profile: `smoke` or `formal`;
+- composition mode `controlled-boundary-orchestration/v1`;
 - the fixed supplementary-source layout identity;
 - the hash-pinned A1-A3 `TrailInformation.out` identity;
 - one shared physical trail position; and
@@ -29,6 +30,11 @@ limits, or A5 sampling fields. Those remain the single responsibility of their
 stage request files. Changing a referenced request therefore remains visible
 and independently validated.
 
+The composition mode is intentionally not called a strict pipeline lineage.
+Only A2's canonical LC sets are passed to A3. A4 uses its deterministic
+generated-for-demo key corpus, while A5 independently reads the hash-pinned
+supplied `KeyCandidate1000.out`; no A4-to-A5 artifact relationship is claimed.
+
 ## Resolution rules
 
 Loading a pipeline plan validates all of the following before the runner can
@@ -43,6 +49,9 @@ begin execution:
 4. A4 and A5 select the same physical trail position as the pipeline manifest.
 5. `smoke` means exactly eight A4 keys and eight A5 repetitions; `formal`
    means exactly 1,000 A4 keys and 100 A5 repetitions.
+6. the composition mode must explicitly identify the controlled orchestration;
+   a strict A4-to-A5 lineage mode is rejected because its producer artifacts
+   are unavailable.
 
 This preserves the important distinction between physical record position and
 the unavailable producer `GroupIndex` semantics.

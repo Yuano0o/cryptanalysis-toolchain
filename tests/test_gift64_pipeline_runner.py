@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import shutil
+import subprocess
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -37,8 +38,21 @@ class Gift64PipelineRunnerTests(unittest.TestCase):
         a1 = observed({"stage": "a1"})
         a2 = observed({"stage": "a2"}, constraint_sets=("lc",))
         a3 = observed({"stage": "a3"})
-        a4 = observed({"stage": "a4"})
-        a5 = observed({"stage": "a5"})
+        a4 = observed(
+            {
+                "stage": "a4",
+                "status_counts": {},
+                "not_started_total_budget_count": 0,
+            }
+        )
+        a5 = observed(
+            {
+                "stage": "a5",
+                "status_counts": {},
+                "not_started_total_budget_count": 0,
+                "estimate": {"point_estimate": "0"},
+            }
+        )
         with (
             patch(
                 "automated_differential_analysis.pipeline_runner."
@@ -71,14 +85,34 @@ class Gift64PipelineRunnerTests(unittest.TestCase):
             )
 
         self.assertEqual(observation.state, "completed")
+        self.assertEqual(observation.result_state, "complete")
         self.assertIsNone(observation.failed_stage)
         self.assertEqual(
             [stage.state for stage in observation.stages],
             ["completed"] * 5,
         )
         self.assertEqual(
+            [stage.result_state for stage in observation.stages],
+            ["complete"] * 5,
+        )
+        self.assertEqual(
             [stage.summary for stage in observation.stages],
-            [{"stage": "a1"}, {"stage": "a2"}, {"stage": "a3"}, {"stage": "a4"}, {"stage": "a5"}],
+            [
+                {"stage": "a1"},
+                {"stage": "a2"},
+                {"stage": "a3"},
+                {
+                    "stage": "a4",
+                    "status_counts": {},
+                    "not_started_total_budget_count": 0,
+                },
+                {
+                    "stage": "a5",
+                    "status_counts": {},
+                    "not_started_total_budget_count": 0,
+                    "estimate": {"point_estimate": "0"},
+                },
+            ],
         )
         self.assertEqual(lnc.call_args.kwargs["lc_constraint_sets"], ("lc",))
 
@@ -115,6 +149,7 @@ class Gift64PipelineRunnerTests(unittest.TestCase):
             )
 
         self.assertEqual(observation.state, "failed")
+        self.assertEqual(observation.result_state, "not_available")
         self.assertEqual(observation.failed_stage, "a2")
         self.assertEqual(
             [stage.state for stage in observation.stages],
@@ -130,6 +165,85 @@ class Gift64PipelineRunnerTests(unittest.TestCase):
         lnc.assert_not_called()
         stage2.assert_not_called()
         stage3.assert_not_called()
+
+    def test_runner_reports_incomplete_native_results_separately(self) -> None:
+        plan = load_gift64_pipeline_demo_plan(SMOKE_CONFIG)
+        source_tree = Gift64PipelineSourceTree(Path("/read-only-source"))
+        with (
+            patch(
+                "automated_differential_analysis.pipeline_runner."
+                "parse_gift64_trail_information",
+                return_value=observed({"stage": "a1"}),
+            ),
+            patch(
+                "automated_differential_analysis.pipeline_runner."
+                "run_gift64_lc_observation",
+                return_value=observed(
+                    {"stage": "a2"}, constraint_sets=("lc",)
+                ),
+            ),
+            patch(
+                "automated_differential_analysis.pipeline_runner."
+                "run_gift64_lnc_observation",
+                return_value=observed({"stage": "a3"}),
+            ),
+            patch(
+                "automated_differential_analysis.pipeline_runner."
+                "run_gift64_stage2_demo",
+                return_value=observed(
+                    {
+                        "status_counts": {"ERROR": 1},
+                        "not_started_total_budget_count": 7,
+                    }
+                ),
+            ),
+            patch(
+                "automated_differential_analysis.pipeline_runner."
+                "run_gift64_stage3_probability_demo",
+                return_value=observed(
+                    {
+                        "status_counts": {"TIMEOUT": 1},
+                        "not_started_total_budget_count": 7,
+                        "estimate": None,
+                    }
+                ),
+            ),
+        ):
+            observation = run_gift64_pipeline_demo(
+                plan=plan, source_tree=source_tree
+            )
+
+        self.assertEqual(observation.state, "completed")
+        self.assertEqual(observation.result_state, "incomplete")
+        self.assertEqual(observation.stages[3].result_state, "incomplete")
+        self.assertEqual(observation.stages[4].result_state, "incomplete")
+
+    def test_runner_structures_subprocess_operational_failure(self) -> None:
+        plan = load_gift64_pipeline_demo_plan(SMOKE_CONFIG)
+        source_tree = Gift64PipelineSourceTree(Path("/read-only-source"))
+        with (
+            patch(
+                "automated_differential_analysis.pipeline_runner."
+                "parse_gift64_trail_information",
+                return_value=observed({"stage": "a1"}),
+            ),
+            patch(
+                "automated_differential_analysis.pipeline_runner."
+                "run_gift64_lc_observation",
+                side_effect=subprocess.TimeoutExpired("brew --prefix", 30),
+            ),
+        ):
+            observation = run_gift64_pipeline_demo(
+                plan=plan, source_tree=source_tree
+            )
+
+        self.assertEqual(observation.state, "failed")
+        self.assertEqual(observation.result_state, "not_available")
+        self.assertEqual(observation.failed_stage, "a2")
+        self.assertEqual(observation.stages[1].state, "failed")
+        self.assertIn(
+            "TimeoutExpired", observation.stages[1].diagnostics[0]
+        )
 
 
 @unittest.skipUnless(
@@ -150,7 +264,11 @@ class Gift64PipelineRunnerIntegrationTests(unittest.TestCase):
         summaries = {stage.stage_id: stage.summary for stage in observation.stages}
 
         self.assertEqual(observation.state, "completed")
+        self.assertEqual(observation.result_state, "complete")
         self.assertTrue(all(stage.state == "completed" for stage in observation.stages))
+        self.assertTrue(
+            all(stage.result_state == "complete" for stage in observation.stages)
+        )
         self.assertEqual(summaries["a1"]["record_count"], 32)
         self.assertTrue(summaries["a3"]["all_base_spaces_implied"])
         self.assertEqual(
@@ -159,6 +277,8 @@ class Gift64PipelineRunnerIntegrationTests(unittest.TestCase):
             8,
         )
         self.assertEqual(len(summaries["a5"]["samples"]), 8)
+        self.assertEqual(summaries["a5"]["not_started_total_budget_count"], 0)
+        self.assertIsNotNone(summaries["a5"]["estimate"])
 
 
 if __name__ == "__main__":

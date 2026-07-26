@@ -49,6 +49,7 @@ _STATUS_RE = re.compile(
     r"(?P<status>SAT|UNSAT|UNKNOWN)$"
 )
 _SOLVER_VERSION_RE = re.compile(r"CryptoMiniSat version ([0-9][0-9.]*)")
+_COMPILE_GUARD_S = 60.0
 
 
 class Gift64Stage2AdapterError(ValueError):
@@ -281,26 +282,36 @@ def _formula_prefix(formula: str) -> Path:
     brew = shutil.which("brew")
     if brew is None:
         raise Gift64Stage2AdapterError("Homebrew is not available")
-    completed = subprocess.run(
-        [brew, "--prefix", formula],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
+    try:
+        completed = subprocess.run(
+            [brew, "--prefix", formula],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise Gift64Stage2AdapterError(
+            f"timed out resolving Homebrew prefix for {formula}"
+        ) from exc
     if completed.returncode != 0 or not completed.stdout.strip():
         raise Gift64Stage2AdapterError(f"cannot resolve Homebrew prefix for {formula}")
     return Path(completed.stdout.strip())
 
 
 def _installed_solver_version(cms_prefix: Path) -> str:
-    completed = subprocess.run(
-        [str(cms_prefix / "bin" / "cryptominisat5"), "--version"],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
+    try:
+        completed = subprocess.run(
+            [str(cms_prefix / "bin" / "cryptominisat5"), "--version"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise Gift64Stage2AdapterError(
+            "timed out determining installed CryptoMiniSat version"
+        ) from exc
     match = _SOLVER_VERSION_RE.search(completed.stdout + "\n" + completed.stderr)
     if completed.returncode != 0 or match is None:
         raise Gift64Stage2AdapterError("cannot determine installed CryptoMiniSat version")
@@ -315,6 +326,14 @@ def _cpu_time(before: os.times_result, after: os.times_result) -> float:
         - before.children_user
         - before.children_system,
     )
+
+
+def _compile_timeout_exhausted_total_budget(
+    remaining_before_compile: float,
+) -> bool:
+    """Distinguish the total budget from the independent compile guard."""
+
+    return remaining_before_compile <= _COMPILE_GUARD_S
 
 
 def _run_one_key(
@@ -492,12 +511,22 @@ def run_gift64_stage2_demo(
                     check=False,
                     capture_output=True,
                     text=True,
-                    timeout=min(60.0, remaining_before_compile),
+                    timeout=min(_COMPILE_GUARD_S, remaining_before_compile),
                 )
-            except subprocess.TimeoutExpired:
+            except subprocess.TimeoutExpired as exc:
                 compile_wall_time_s = time.monotonic() - compile_start
+                if not _compile_timeout_exhausted_total_budget(
+                    remaining_before_compile
+                ):
+                    raise Gift64Stage2AdapterError(
+                        "temporary Stage 2 compilation exceeded the "
+                        f"{_COMPILE_GUARD_S:g}-second compile guard"
+                    ) from exc
                 total_time_budget_exhausted = True
-                results = tuple(_not_started_total_budget_result(index) for index in range(len(keys)))
+                results = tuple(
+                    _not_started_total_budget_result(index)
+                    for index in range(len(keys))
+                )
             else:
                 compile_wall_time_s = time.monotonic() - compile_start
                 if compiled.returncode != 0:

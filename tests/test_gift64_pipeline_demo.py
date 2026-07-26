@@ -4,6 +4,7 @@ from pathlib import Path
 import unittest
 
 from automated_differential_analysis.formats import (
+    GIFT64_PIPELINE_COMPOSITION_MODE,
     Gift64PipelineDemoConfig,
     Gift64PipelineDemoError,
     load_gift64_pipeline_demo_config,
@@ -33,6 +34,7 @@ class Gift64PipelineDemoTests(unittest.TestCase):
             config.to_dict(),
         )
         self.assertEqual(config.profile, "smoke")
+        self.assertEqual(config.composition_mode, GIFT64_PIPELINE_COMPOSITION_MODE)
         self.assertEqual(plan.stage2_request.key_corpus.key_count, 8)
         self.assertEqual(plan.stage3_request.repeat_count, 8)
         self.assertEqual(plan.stage2_request.trail_position, config.trail_position)
@@ -53,6 +55,10 @@ class Gift64PipelineDemoTests(unittest.TestCase):
         data = load_gift64_pipeline_demo_config(SMOKE_CONFIG).to_dict()
         data["stages"]["a3"]["enabled"] = False
         with self.assertRaisesRegex(Gift64PipelineDemoError, "must be true"):
+            Gift64PipelineDemoConfig.from_dict(data)
+        data = load_gift64_pipeline_demo_config(SMOKE_CONFIG).to_dict()
+        data["composition_mode"] = "strict-a4-a5-lineage"
+        with self.assertRaisesRegex(Gift64PipelineDemoError, "composition mode"):
             Gift64PipelineDemoConfig.from_dict(data)
 
     def test_plan_rejects_profile_sample_count_mismatch(self) -> None:
