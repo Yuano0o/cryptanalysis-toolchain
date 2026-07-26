@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import shutil
 import subprocess
@@ -256,29 +257,105 @@ class Gift64PipelineRunnerTests(unittest.TestCase):
     "read-only supplementary source, compiler or Homebrew is unavailable",
 )
 class Gift64PipelineRunnerIntegrationTests(unittest.TestCase):
-    def test_smoke_plan_completes_all_a1_a5_stages(self) -> None:
+    def test_seven_item_acceptance_smoke(self) -> None:
+        plan = load_gift64_pipeline_demo_plan(SMOKE_CONFIG)
         observation = run_gift64_pipeline_demo(
-            plan=load_gift64_pipeline_demo_plan(SMOKE_CONFIG),
+            plan=plan,
             source_tree=Gift64PipelineSourceTree(SOURCE_ROOT),
+        )
+        summary = observation.summary_dict()
+        serialized_summary = json.loads(
+            json.dumps(summary, ensure_ascii=True, sort_keys=True)
         )
         summaries = {stage.stage_id: stage.summary for stage in observation.stages}
 
+        # Unified plan, runner, terminal semantics and generated summary.
         self.assertEqual(observation.state, "completed")
         self.assertEqual(observation.result_state, "complete")
         self.assertTrue(all(stage.state == "completed" for stage in observation.stages))
         self.assertTrue(
             all(stage.result_state == "complete" for stage in observation.stages)
         )
+        self.assertEqual(serialized_summary, summary)
+        self.assertEqual(
+            summary["schema_version"], "gift64-pipeline-observation/v2"
+        )
+        self.assertEqual(
+            summary["composition_mode"], "controlled-boundary-orchestration/v1"
+        )
+        self.assertEqual(summary["request"]["pipeline"], plan.config.to_dict())
+        self.assertEqual(summary["request"]["stage2"], plan.stage2_request.to_dict())
+        self.assertEqual(summary["request"]["stage3"], plan.stage3_request.to_dict())
+        self.assertEqual(
+            [stage["stage_id"] for stage in summary["stages"]],
+            ["a1", "a2", "a3", "a4", "a5"],
+        )
+        self.assertIn("not a paper-level reproduction", summary["claim_boundary"])
+
+        # A1-A3 fixture identity, LNC semantics and the LC/LNC association rule.
         self.assertEqual(summaries["a1"]["record_count"], 32)
+        self.assertEqual(
+            summaries["a1"]["source_sha256"],
+            plan.config.trail_information_source_sha256,
+        )
+        self.assertEqual(summaries["a2"]["constraint_set_count"], 32)
+        self.assertEqual(summaries["a2"]["rank_values"], [6])
+        self.assertEqual(
+            summaries["a2"]["trail_source_sha256"],
+            plan.config.trail_information_source_sha256,
+        )
+        self.assertEqual(summaries["a3"]["constraint_set_count"], 32)
+        self.assertEqual(summaries["a3"]["base_rank_values"], [6])
+        self.assertEqual(summaries["a3"]["combined_rank_values"], [8])
+        self.assertEqual(summaries["a3"]["incremental_rank_values"], [2])
         self.assertTrue(summaries["a3"]["all_base_spaces_implied"])
+        self.assertEqual(
+            summaries["a3"]["trail_source_sha256"],
+            plan.config.trail_information_source_sha256,
+        )
+
+        # Stage 2 configurable deterministic key corpus and complete accounting.
+        self.assertEqual(
+            summaries["a4"]["key_corpus"],
+            plan.stage2_request.key_corpus.to_dict(),
+        )
+        self.assertEqual(
+            summaries["a4"]["trail_position"], plan.config.trail_position
+        )
         self.assertEqual(
             sum(summaries["a4"]["status_counts"].values())
             + summaries["a4"]["not_started_total_budget_count"],
-            8,
+            plan.stage2_request.key_corpus.key_count,
         )
-        self.assertEqual(len(summaries["a5"]["samples"]), 8)
+        self.assertEqual(
+            len(summaries["a4"]["results"]),
+            plan.stage2_request.key_corpus.key_count,
+        )
+        self.assertEqual(
+            summaries["a4"]["trail_source_sha256"],
+            plan.config.trail_information_source_sha256,
+        )
+
+        # Stage 3 fixed seed, unified probability result and complete accounting.
+        self.assertEqual(
+            summaries["a5"]["request"], plan.stage3_request.to_dict()
+        )
+        self.assertEqual(
+            len(summaries["a5"]["samples"]), plan.stage3_request.repeat_count
+        )
         self.assertEqual(summaries["a5"]["not_started_total_budget_count"], 0)
         self.assertIsNotNone(summaries["a5"]["estimate"])
+        self.assertEqual(
+            summaries["a5"]["estimate"]["completed_sample_count"],
+            plan.stage3_request.repeat_count,
+        )
+        self.assertTrue(
+            all(sample["complete"] for sample in summaries["a5"]["samples"])
+        )
+        self.assertEqual(
+            summaries["a5"]["trail_source_sha256"],
+            plan.config.trail_information_source_sha256,
+        )
 
 
 if __name__ == "__main__":

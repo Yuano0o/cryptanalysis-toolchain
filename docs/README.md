@@ -64,6 +64,9 @@ These files reflect the latest full workspace and paper scan:
 - [gift64_pipeline_runner_a1_a5.md](current_analysis/gift64_pipeline_runner_a1_a5.md):
   dependency-ordered A1-A5 runner, failure semantics, smoke evidence and
   command-line use.
+- [gift64_pipeline_acceptance_a1_a5.md](current_analysis/gift64_pipeline_acceptance_a1_a5.md):
+  explicit seven-item joint acceptance, executed evidence, decision boundary
+  and the resolved acceptance-evidence finding.
 
 ### Prior planning
 

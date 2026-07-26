@@ -87,7 +87,7 @@ maintenance items, blockers and the next action.
 
 ## Current Update — GIFT-64 Pipeline A1-A5
 
-The completed milestone is a controlled, reviewable GIFT-64
+The implemented milestone is a controlled, reviewable GIFT-64
 differential-analysis pipeline demo. A1-A5 expose the supplied artifacts and
 legacy programs through explicit, versioned boundaries:
 
@@ -101,16 +101,17 @@ legacy programs through explicit, versioned boundaries:
 | A1-A5 config | Validated smoke/formal manifest binds the shared fixture/trail and referenced A4/A5 requests | [Configuration details](docs/current_analysis/gift64_pipeline_a1_a5_config.md) |
 | A1-A5 runner | One controlled smoke/formal orchestration entry point with separate execution/result states and a generated structured summary | [Runner details](docs/current_analysis/gift64_pipeline_runner_a1_a5.md) |
 
-The smoke runner has completed once locally across A1-A5. It is a controlled
+The smoke runner has completed locally across A1-A5. It is a controlled
 boundary orchestration, not a strict A4-to-A5 artifact data flow or paper
 reproduction; the missing original `KeyCandidate.out`, trail-generation
 provenance and proof-producing `UNSAT` workflow remain material limits.
 
-The seven-item integrated-demo acceptance is complete. **Next step:** recover
-the coexistence-matrix semantics. See
-[project status](docs/current_analysis/project_status.md) for the completed
-acceptance tracker and
-[materials status](docs/current_analysis/materials_status.md) for
+The component implementation, focused joint review and
+[explicit seven-item acceptance](docs/current_analysis/gift64_pipeline_acceptance_a1_a5.md)
+are complete within the controlled-orchestration claim boundary. **Next step:**
+recover the coexistence-matrix semantics. See
+[project status](docs/current_analysis/project_status.md) for current progress
+and [materials status](docs/current_analysis/materials_status.md) for
 paper-reproduction blockers.
 
 ## Planned Evaluation

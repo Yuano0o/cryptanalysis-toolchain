@@ -80,4 +80,9 @@ constraint-set dependency, execution/result-state separation, subprocess
 failure propagation, and a smoke-sized end-to-end run when the read-only
 source, compiler and solver environment are available.
 
-The post-hardening complete suite contains 106 passing tests.
+The real integration test now serves as the explicit seven-item acceptance
+regression: it jointly checks the resolved plan, shared fixture identity,
+LC/LNC ranks and implication, complete A4/A5 accounting, Stage 3 estimate
+coverage, JSON serialization, ordered summaries and the claim boundary. The
+decision and executed evidence are recorded in
+[`gift64_pipeline_acceptance_a1_a5.md`](gift64_pipeline_acceptance_a1_a5.md).
