@@ -1,0 +1,17 @@
+{
+  "fixed_bit_count": 21,
+  "key_position": 0,
+  "repeat_count": 100,
+  "request_id": "gift64-stage3-a5-fixture-key-0-trail-record-0",
+  "resources": {
+    "per_sample_time_limit_s": 30.0,
+    "total_time_limit_s": 300.0
+  },
+  "sampling_seed": 20260726,
+  "schema_version": "gift64-stage3-probability-request/v2",
+  "solver": {
+    "name": "cryptominisat",
+    "version": "5.14.7"
+  },
+  "trail_position": 0
+}

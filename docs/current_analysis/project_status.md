@@ -11,9 +11,9 @@
 |---|---|---|
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
-| Stage-contract schema design | in-progress | Solver, trail, TrailInformation, GF(2) `ConstraintSet` and space-comparison contracts are implemented; right-key/probability contracts remain |
+| Stage-contract schema design | in-progress | Solver, trail, TrailInformation, GF(2) `ConstraintSet`, space comparison, Stage 2 key corpus and bounded Stage 3 probability contracts are implemented; right-key contracts remain |
 | SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
-| Workstream A pipeline implementation | in-progress | Controlled SAT, TrailInformation, LC and linearised-relation normalization boundaries are complete; Stage 2 and later stages remain |
+| Workstream A pipeline implementation | in-progress | Controlled SAT, TrailInformation, LC/LNC normalization, Stage 2 fixed-key and Stage 3 probability demos are complete; coexistence and later stages remain |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -41,13 +41,16 @@ Completed checkpoints:
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
-| Common artifact contracts | in-progress | Solver, `TrailRecord`, TrailInformation, `constraint-set/v1` and `constraint-space-comparison/v1` implemented | Define deterministic key-corpus and Stage 2 result contracts | Right-key sampling semantics remain |
+| Common artifact contracts | in-progress | Solver, `TrailRecord`, TrailInformation, constraint spaces, Stage 2 corpus and Stage 3 subcube probability request/observation summaries implemented | Define right-key/aggregation contracts | Right-key sampling semantics remain |
 | SAT trail search boundary | complete | B1-B7 pass; live audit reruns preserved verified `SAT` with components `11`/`1` | Maintain the audit register; reuse only within its supported-claim boundary | No A1/A2 blocker |
 | `TrailInformation.out` parser | complete | A1 recovers 32 records, `[5,13)` rounds, round-4 key-state anchor and MSB-first order | Reuse as the normalized Stage 2 trail input | Exact trail selection/concatenation provenance is missing |
 | LC extraction adapter | complete | A2 observes pinned matrices, folds fixed constants and canonicalizes 32 rank-6 GF(2) spaces | Add independent derivation later | Current exactness is relative to pinned legacy source |
 | LNC extraction adapter | complete | A3 normalizes 32 combined rank-8 spaces; every LC base is implied with incremental rank 2 | Reuse the comparison boundary in Stage 2 reporting | Current exactness is relative to pinned legacy source |
-| Stage 2 fixed-key validation | ready-for-static-work | Legacy code inspected; controlled demo may use a new deterministic corpus | Define key-corpus contract and configurable adapter | Original million-key result remains blocked by missing provenance |
-| Stage 3 probability | ready-for-static-work | Code and `KeyCandidate1000.out` present | Specify sampling/probability contract | Exact reproduction needs seed/statistical decisions |
+| Stage 2 fixed-key validation | complete-draft | A4 has deterministic key generation, source/trail pinning, explicit physical trail selection, per-key timeout and native status summary | Select additional physical positions or proceed to Stage 3 | Original million-key result remains blocked by missing provenance and no UNSAT proof is emitted |
+| Stage 3 probability | complete-draft | A5 has deterministic subcube sampling, source/fixture pinning, explicit key/trail positions, per-sample and total budgets, 64-bit complete-count checks and completion-gated descriptive estimates | Extend selected key/trail coverage under the declared total budget | Fixture generator/provenance is missing; no global exact/probability claim |
+| Unified demo runner | not-started | A1-A5 have separate scripts and versioned stage-specific requests | Define one orchestration request and run A1-A5 in dependency order | A4 total-budget semantics must be fixed first |
+| End-to-end demo regression | not-started | Stage-level unit and integration tests pass independently | Add one small deterministic A1-A5 regression using smoke-sized inputs | No unified runner or integrated observation yet |
+| Integrated result summary | not-started | A1-A5 each expose structured or JSON-compatible summaries | Define one provenance-preserving pipeline summary | Cross-stage status and failure semantics are not yet defined |
 | Trail coexistence | ready-for-static-work | Code and matrix present | Recover matrix semantics | Matrix generator absent |
 | 18/19-round construction | blocked | Paper results known | Obtain/formalise extension construction | No generator/entry found |
 | Attack-level regression | blocked | Improved paper and two small source files present | Request missing enumeration/attack code | Public archive incomplete |
@@ -75,9 +78,32 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Define a deterministic versioned 128-bit key-corpus contract for the demo.
-2. Wrap Stage 2 with configurable sample size, explicit trail selection and
-   controlled solver statuses.
+1. Harden A4 before orchestration:
+   - add a finite total run-time budget covering compilation and all key runs;
+   - retain an 8-key smoke request and add a separate 1,000-key formal-demo
+     request;
+   - expose total-budget exhaustion without presenting unrun keys as native
+     solver outcomes;
+   - record total run wall time in the observation.
+2. Define one unified A1-A5 demo configuration and pipeline runner.
+3. Add a smoke-sized end-to-end regression and a provenance-preserving
+   generated summary.
+4. Review the seven-item integrated-demo acceptance boundary.
+5. Recover the Stage 6 coexistence-matrix semantics without claiming to
+   regenerate its missing producer artifact.
+
+## Integrated demo acceptance tracker
+
+| Requirement | Status | Evidence / remaining work |
+|---|---|---|
+| A3 LNC semantics and adapter | complete | Combined rank-8 affine spaces are normalized and compared against the rank-6 LC bases |
+| LC/LNC merge or association rule | complete | Combined space must imply LC; incremental rank records the added information without treating a complementary basis as unique |
+| Stage 2 configurable sample count and deterministic keys | complete-draft | A4 request controls `key_count` and uses `sha256-counter-v1`; total budget and formal/smoke request split remain |
+| Stage 3 fixed seed and unified probability result format | complete-draft | A5 v2 request/observation has deterministic sampling, finite budgets and completion-gated descriptive estimates |
+| Unified configuration and pipeline runner | not-started | Current stage requests and scripts are separate |
+| End-to-end small regression | not-started | Stage-level integrations exist, but no single A1-A5 orchestration regression exists |
+| Automatically generated result summary | partial | Each stage can summarize itself; no integrated cross-stage summary exists |
+| Final acceptance after all seven items are integrated | not-started | Depends on A4 hardening, runner, end-to-end regression and integrated summary |
 
 ## SAT baseline maintenance register
 
@@ -130,3 +156,12 @@ The authoritative details and completion evidence are in
 - 2026-07-26: completed pipeline A3 locally by recovering the global
   linearised-relation matrix, normalizing 32 combined rank-8 spaces and proving
   that each implies its rank-6 A2 LC base with incremental rank 2.
+- 2026-07-26: completed pipeline A4 locally with a deterministic
+  `generated-for-demo` key-corpus contract, a hash-pinned temporary Stage 2
+  adapter, explicit physical trail selection, per-key timeout and structured
+  native SAT-status summary; the absent author million-key corpus continues to
+  block paper-level reproduction.
+- 2026-07-26: completed pipeline A5 locally with a hash-pinned supplied
+  1,000-key fixture, deterministic replacement of the legacy unseeded subcube
+  sampler, per-sample timeout, completion-gated solution counting and a
+  descriptive probability-estimate contract.

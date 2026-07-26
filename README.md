@@ -60,7 +60,7 @@ candidate space
   → verified result
 ```
 
-## Current Update — SAT Baseline B1-B7
+## Completed Foundation — SAT Baseline B1-B7
 
 The minimal four-round GIFT-64 SAT baseline is complete. It is an
 infrastructure and regression baseline, not a reproduction of the full
@@ -85,60 +85,32 @@ reproduction or a general performance claim. See
 [project status](docs/current_analysis/project_status.md) for current progress,
 maintenance items, blockers and the next action.
 
-**Next step:** define a deterministic `generated-for-demo` key-corpus contract
-and a bounded Stage 2 adapter with explicit trail selection. The missing
-original `KeyCandidate.out` continues to block paper-level Stage 2
-reproduction, but it does not block the controlled demo; see
-[materials status](docs/current_analysis/materials_status.md).
+## Current Update — GIFT-64 Pipeline A1-A5
 
-## Current Update — GIFT-64 Pipeline A1
+The active milestone is a controlled, reviewable GIFT-64 differential-analysis
+pipeline demo. A1-A5 now expose the supplied artifacts and legacy programs
+through explicit, versioned boundaries:
 
-The first differential-level artifact boundary is now explicit. A strict
-read-only parser maps the four byte-identical upstream
-`TrailInformation.out` copies into the versioned
-`gift64-trail-information/v1` corpus:
+| Part | Current result | Details |
+|---|---|---|
+| A1 | Strict `TrailInformation.out` parser: 32 physical records over rounds `[5,13)` | [A1 details](docs/current_analysis/gift64_trail_information_a1.md) |
+| A2 | Canonical GF(2) LC spaces: rank 6 for all 32 records | [A2 details](docs/current_analysis/gift64_linear_constraints_a2.md) |
+| A3 | LC plus linearised-relation spaces: rank 8, incremental rank 2, LC implied for all 32 records | [A3 details](docs/current_analysis/gift64_linearized_constraints_a3.md) |
+| A4 | Deterministic generated-key Stage 2 demo with explicit trail position and native per-key statuses | [A4 details](docs/current_analysis/gift64_stage2_a4.md) |
+| A5 | Seeded, budgeted Stage 3 subcube counting with completion-gated descriptive probability output | [A5 details](docs/current_analysis/gift64_stage3_a5.md) |
 
-- eight positional groups with four trails each;
-- eight differential rounds over the half-open interval `[5, 13)`;
-- a 128-bit key-state difference anchored at round 4;
-- four 16-bit words per 64-bit state, expanded MSB-first;
-- validated record shape, round continuity and group consistency.
+These checkpoints support a non-paper-reproduction demo. The missing original
+`KeyCandidate.out`, trail-generation provenance and proof-producing `UNSAT`
+workflow still limit stronger claims.
 
-The file order does not match the producer's declared `GroupIndex` order, so
-the contract deliberately records `group_position` rather than inventing a
-semantic group identifier. The producer-run commands, seeds, four-trail
-selection rule and concatenation manifest remain missing. A1 therefore makes
-the supplied LC/LNC input reproducible without claiming to reproduce its
-generation. See
-[`docs/current_analysis/gift64_trail_information_a1.md`](docs/current_analysis/gift64_trail_information_a1.md).
-
-## Current Update — GIFT-64 Pipeline A2
-
-The LC stage now has a structured `constraint-set/v1` boundary. A
-hash-pinned temporary observation of the unchanged supplementary program maps
-its post-elimination rows into GF(2) master-key equations, evaluates fixed
-round-constant terms, computes deterministic RREF rows and assigns a semantic
-affine-space hash.
-
-The bundled fixture yields 32 distinct constraint sets with six independent
-equations per trail. The first trail agrees with the six equations in the
-supplementary linear-constraint figure. This is exact reproduction of the
-pinned legacy matrix output, not yet an independent proof of the LC algorithm.
-See
-[`docs/current_analysis/gift64_linear_constraints_a2.md`](docs/current_analysis/gift64_linear_constraints_a2.md).
-
-## Current Update — GIFT-64 Pipeline A3
-
-The linearised-constraint stage now has a structured combined-space boundary.
-Its legacy output is correctly represented as
-`LC_PLUS_LINEARIZED_RELATIONS`, rather than as eight wholly new LNC equations,
-and is compared algebraically against each A2 LC base.
-
-Across all 32 positional trails, the combined spaces have rank 8, imply the
-corresponding rank-6 LC spaces and add incremental rank 2. The comparison is
-recorded through `constraint-space-comparison/v1`; a particular complementary
-equation basis is not treated as unique semantics. See
-[`docs/current_analysis/gift64_linearized_constraints_a3.md`](docs/current_analysis/gift64_linearized_constraints_a3.md).
+**Next step:** harden A4 with separate 8-key smoke and 1,000-key formal-demo
+requests plus a total run budget, then add one unified A1-A5 configuration,
+pipeline runner, end-to-end regression and generated summary. Only after that
+integration boundary passes should the project record the seven-item demo
+acceptance and move to coexistence-matrix semantics. See
+[project status](docs/current_analysis/project_status.md) for the acceptance
+tracker and [materials status](docs/current_analysis/materials_status.md) for
+paper-reproduction blockers.
 
 ## Planned Evaluation
 
