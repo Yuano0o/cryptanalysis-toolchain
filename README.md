@@ -85,10 +85,10 @@ reproduction or a general performance claim. See
 [project status](docs/current_analysis/project_status.md) for current progress,
 maintenance items, blockers and the next action.
 
-**Next step:** extend the controlled Stage 2 demo across explicitly selected
-physical trail records, or define the separate Stage 3 probability-estimation
-boundary. The missing original `KeyCandidate.out` continues to block
-paper-level Stage 2 reproduction; see
+**Next step:** extend the controlled Stage 3 demo across explicitly selected
+fixture-key and physical trail-record positions under a declared total budget,
+or inspect the Stage 6 coexistence-matrix boundary. The missing original
+`KeyCandidate.out` continues to block paper-level Stage 2 reproduction; see
 [materials status](docs/current_analysis/materials_status.md).
 
 ## Current Update — GIFT-64 Pipeline A1
@@ -152,6 +152,18 @@ The result records native solver statuses for one selected physical
 million-key `KeyCandidate.out` experiment, a proof-producing `UNSAT` workflow,
 or a paper-level result. See
 [`docs/current_analysis/gift64_stage2_a4.md`](docs/current_analysis/gift64_stage2_a4.md).
+
+## Current Update — GIFT-64 Pipeline A5
+
+Stage 3 now has a controlled remaining-probability boundary. The supplied
+`KeyCandidate1000.out` is treated as a hash-pinned upstream fixture, while the
+legacy unseeded random subcube restrictions are replaced only in a temporary
+source copy by deterministic request-seeded sampling. A probability estimate
+is emitted only after every selected subcube reaches native `UNSAT` exhaustion.
+
+This is a descriptive fixed-key/trail estimate, not exact counting, a
+paper-level probability result or proof-producing `UNSAT` verification. See
+[`docs/current_analysis/gift64_stage3_a5.md`](docs/current_analysis/gift64_stage3_a5.md).
 
 ## Planned Evaluation
 

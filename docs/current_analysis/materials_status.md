@@ -25,6 +25,8 @@ The current workspace is sufficient to:
 - generate a new deterministic key corpus for a controlled Stage 2 demo;
 - execute a hash-pinned, per-key-bounded Stage 2 demo for one explicitly
   selected physical trail-record position;
+- execute deterministic, per-sample-bounded Stage 3 subcube counts against the
+  supplied 1,000-key fixture;
 - build small parser and verifier fixtures that do not invoke a solver.
 
 It is not sufficient to reproduce the complete GIFT differential-level paper.
@@ -61,7 +63,7 @@ It is not sufficient to reproduce the complete GIFT differential-level paper.
 | Independent LC derivation | missing-nonblocking | Current adapter exactly observes legacy matrices but does not independently recompute them | Stronger algorithmic verification | Reimplement/test DDT affine spaces and elimination separately |
 | LNC-stage equations | available | Pinned LNC source; combined `constraint-set/v1` spaces yield rank 8 and imply every rank-6 LC base with incremental rank 2 | Structured linearised-relation boundary | Add an independent `DDTInOutRelation` derivation later |
 | Generated Stage 2 demo corpus | available | `gift64-stage2-key-corpus/v1`; domain-separated SHA-256 counter generator and tracked eight-key request | Controlled fixed-key demonstration | Keep generated corpus/result files out of Git and retain `generated-for-demo` label |
-| `KeyCandidate1000.out` | available | Included in GIFT stage 5 | Stage 3 input fixture | Recover format and provenance limitations |
+| `KeyCandidate1000.out` | available | Included in GIFT stage 5; hash-pinned by A5 as a 1,000-record read-only fixture | Controlled Stage 3 subcube-count demo | Generator, distribution, seed and relation to Stage 2 corpus remain unknown |
 | `KeyCandidate.out` | missing-blocking | Referenced by stage 4, not included; A4 replaces it only with a labelled temporary demo corpus | Paper-level Stage 2 reproduction | Obtain generator, distribution, seed and hash |
 | `AllMatrix33Trail.out` | partial | Included in GIFT stage 6 | Coexistence input fixture | Generator and semantic schema are missing |
 | Minor-trail enumeration/generator | missing-blocking | No complete path found | Reproduce minor-trail accumulation | Ask for code/config/results provenance |

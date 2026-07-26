@@ -32,6 +32,15 @@ from .gift64_stage2_demo_request import (
     Gift64Stage2DemoRequestError,
     load_gift64_stage2_demo_request,
 )
+from .gift64_stage3_probability import (
+    GIFT64_STAGE3_PROBABILITY_OBSERVATION_SCHEMA_VERSION,
+    GIFT64_STAGE3_PROBABILITY_REQUEST_SCHEMA_VERSION,
+    Gift64Stage3ProbabilityError,
+    Gift64Stage3ProbabilityRequest,
+    SubcubeProbabilityEstimate,
+    estimate_subcube_probability,
+    load_gift64_stage3_probability_request,
+)
 
 __all__ = [
     "DEFAULT_GIFT64_TRAIL_INFORMATION_LAYOUT",
@@ -60,4 +69,11 @@ __all__ = [
     "Gift64Stage2DemoRequest",
     "Gift64Stage2DemoRequestError",
     "load_gift64_stage2_demo_request",
+    "GIFT64_STAGE3_PROBABILITY_OBSERVATION_SCHEMA_VERSION",
+    "GIFT64_STAGE3_PROBABILITY_REQUEST_SCHEMA_VERSION",
+    "Gift64Stage3ProbabilityError",
+    "Gift64Stage3ProbabilityRequest",
+    "SubcubeProbabilityEstimate",
+    "estimate_subcube_probability",
+    "load_gift64_stage3_probability_request",
 ]

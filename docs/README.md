@@ -55,6 +55,9 @@ These files reflect the latest full workspace and paper scan:
 - [gift64_stage2_a4.md](current_analysis/gift64_stage2_a4.md): deterministic
   generated-for-demo key-corpus contract, bounded hash-pinned Stage 2 adapter,
   explicit physical trail selection and fixed-key status boundary.
+- [gift64_stage3_a5.md](current_analysis/gift64_stage3_a5.md): controlled
+  deterministic Stage 3 subcube counting, supplied-fixture provenance,
+  completion policy and empirical-estimate boundary.
 
 ### Prior planning
 

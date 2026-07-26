@@ -11,9 +11,9 @@
 |---|---|---|
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
-| Stage-contract schema design | in-progress | Solver, trail, TrailInformation, GF(2) `ConstraintSet`, space comparison and bounded Stage 2 key-corpus/request contracts are implemented; right-key/probability contracts remain |
+| Stage-contract schema design | in-progress | Solver, trail, TrailInformation, GF(2) `ConstraintSet`, space comparison, Stage 2 key corpus and bounded Stage 3 probability contracts are implemented; right-key contracts remain |
 | SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
-| Workstream A pipeline implementation | in-progress | Controlled SAT, TrailInformation, LC/LNC normalization and a bounded Stage 2 fixed-key demo are complete; Stage 3 and later stages remain |
+| Workstream A pipeline implementation | in-progress | Controlled SAT, TrailInformation, LC/LNC normalization, Stage 2 fixed-key and Stage 3 probability demos are complete; coexistence and later stages remain |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -41,13 +41,13 @@ Completed checkpoints:
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
-| Common artifact contracts | in-progress | Solver, `TrailRecord`, TrailInformation, constraint spaces, `gift64-stage2-key-corpus/v1` and Stage 2 demo request/result summaries implemented | Define probability/right-key contracts | Right-key sampling semantics remain |
+| Common artifact contracts | in-progress | Solver, `TrailRecord`, TrailInformation, constraint spaces, Stage 2 corpus and Stage 3 subcube probability request/observation summaries implemented | Define right-key/aggregation contracts | Right-key sampling semantics remain |
 | SAT trail search boundary | complete | B1-B7 pass; live audit reruns preserved verified `SAT` with components `11`/`1` | Maintain the audit register; reuse only within its supported-claim boundary | No A1/A2 blocker |
 | `TrailInformation.out` parser | complete | A1 recovers 32 records, `[5,13)` rounds, round-4 key-state anchor and MSB-first order | Reuse as the normalized Stage 2 trail input | Exact trail selection/concatenation provenance is missing |
 | LC extraction adapter | complete | A2 observes pinned matrices, folds fixed constants and canonicalizes 32 rank-6 GF(2) spaces | Add independent derivation later | Current exactness is relative to pinned legacy source |
 | LNC extraction adapter | complete | A3 normalizes 32 combined rank-8 spaces; every LC base is implied with incremental rank 2 | Reuse the comparison boundary in Stage 2 reporting | Current exactness is relative to pinned legacy source |
 | Stage 2 fixed-key validation | complete-draft | A4 has deterministic key generation, source/trail pinning, explicit physical trail selection, per-key timeout and native status summary | Select additional physical positions or proceed to Stage 3 | Original million-key result remains blocked by missing provenance and no UNSAT proof is emitted |
-| Stage 3 probability | ready-for-static-work | Code and `KeyCandidate1000.out` present | Specify sampling/probability contract | Exact reproduction needs seed/statistical decisions |
+| Stage 3 probability | complete-draft | A5 has deterministic subcube sampling, source/fixture pinning, explicit key/trail positions, per-sample timeout and completion-gated estimates | Extend selected key/trail coverage under an explicit total budget | Fixture generator/provenance is missing; no global exact/probability claim |
 | Trail coexistence | ready-for-static-work | Code and matrix present | Recover matrix semantics | Matrix generator absent |
 | 18/19-round construction | blocked | Paper results known | Obtain/formalise extension construction | No generator/entry found |
 | Attack-level regression | blocked | Improved paper and two small source files present | Request missing enumeration/attack code | Public archive incomplete |
@@ -75,10 +75,10 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Decide whether the next demo should cover more explicitly selected physical
-   Stage 2 trail positions within a fixed total time budget.
-2. Define Stage 3's probability-estimation contract and its sampling/reporting
-   boundary.
+1. Decide whether to extend A5 across selected fixture-key/trail positions
+   under a fixed total time budget, and define aggregation assumptions.
+2. Recover the Stage 6 coexistence-matrix semantics without claiming to
+   regenerate its missing producer artifact.
 
 ## SAT baseline maintenance register
 
@@ -136,3 +136,7 @@ The authoritative details and completion evidence are in
   adapter, explicit physical trail selection, per-key timeout and structured
   native SAT-status summary; the absent author million-key corpus continues to
   block paper-level reproduction.
+- 2026-07-26: completed pipeline A5 locally with a hash-pinned supplied
+  1,000-key fixture, deterministic replacement of the legacy unseeded subcube
+  sampler, per-sample timeout, completion-gated solution counting and a
+  descriptive probability-estimate contract.
