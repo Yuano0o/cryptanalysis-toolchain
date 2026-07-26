@@ -56,17 +56,25 @@ before commit `49fd340`:
 
 ## Update rules
 
-1. Update `current_analysis/materials_status.md` when a paper, archive, dataset,
+1. Keep the root `README.md` as an outcome-first project overview. After each
+   completed part, add only a short result summary, its detail link, the current
+   progress link and the next step.
+2. Put implementation evidence, methodology, commands, limitations and
+   detailed results in a dedicated `current_analysis/<part>.md` file.
+3. Update `current_analysis/materials_status.md` when a paper, archive, dataset,
    solver, expected output or external code source is added or confirmed
    unavailable.
-2. Update `current_analysis/project_status.md` after a milestone changes state
+4. Update `current_analysis/project_status.md` after a milestone changes state
    or a blocker is added/removed.
-3. Update `current_analysis/sat_baseline.md` after each baseline checkpoint,
-   including static review, configuration, compilation, solve, independent
-   validation and regression capture.
-4. Keep generated CNF, solver logs, binaries, datasets and model outputs out of
+5. Update the relevant part index, such as
+   `current_analysis/sat_baseline.md`, after each checkpoint, including static
+   review, configuration, execution, independent validation and regression
+   capture.
+6. End each completed part by updating the recorded next step and linking both
+   its detail file and `project_status.md` from the root README.
+7. Keep generated CNF, solver logs, binaries, datasets and model outputs out of
    this directory and out of Git.
-5. Record evidence and paths. Do not mark a result reproduced until the exact
+8. Record evidence and paths. Do not mark a result reproduced until the exact
    configuration and independent validation are both available.
-6. Treat `prior_planning/` as a preserved reference set. Reconcile differences
+9. Treat `prior_planning/` as a preserved reference set. Reconcile differences
    explicitly instead of silently merging it into the current analysis.
