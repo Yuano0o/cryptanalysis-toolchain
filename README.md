@@ -85,8 +85,9 @@ reproduction or a general performance claim. See
 [project status](docs/current_analysis/project_status.md) for current progress,
 maintenance items, blockers and the next action.
 
-**Next step:** resolve the missing GIFT differential-level materials and choose
-a bounded formal pipeline target. A1/A2 exploratory work remains frozen; see
+**Next step:** complete the bounded A2 LC `ConstraintSet` boundary against the
+supplied corpus. Missing generation provenance and `KeyCandidate.out` continue
+to block paper-level Stage 2 reproduction; see
 [materials status](docs/current_analysis/materials_status.md).
 
 ## Current Update — GIFT-64 Pipeline A1

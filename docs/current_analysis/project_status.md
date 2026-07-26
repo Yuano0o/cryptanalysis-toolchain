@@ -43,7 +43,7 @@ Completed checkpoints:
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
 | Common artifact contracts | in-progress | Solver contracts, minimal `TrailRecord` and `gift64-trail-information/v1` implemented | Define LC `ConstraintSet` from actual producer/consumer semantics | Later representation choices need validation |
 | SAT trail search boundary | complete | B1-B7 pass; live audit reruns preserved verified `SAT` with components `11`/`1` | Maintain the audit register; reuse only within its supported-claim boundary | No A1/A2 blocker |
-| `TrailInformation.out` parser | complete | A1 recovers 32 records, `[5,13)` rounds, round-4 key-state anchor and MSB-first order; 46-test suite passes | Use as the only normalized trail input for A2 | Exact trail selection/concatenation provenance is missing |
+| `TrailInformation.out` parser | complete | A1 recovers 32 records, `[5,13)` rounds, round-4 key-state anchor and MSB-first order; 47-test suite passes | Use as the only normalized trail input for A2 | Exact trail selection/concatenation provenance is missing |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
 | Stage 2 fixed-key validation | blocked | Code inspected | Obtain/generate `KeyCandidate.out` reproducibly | Missing generator/file provenance |

@@ -123,7 +123,7 @@ and source hash. Raw trails are neither copied nor committed.
 
 ## Test evidence
 
-The repository suite now has 46 passing tests, including:
+The repository suite now has 47 passing tests, including:
 
 - a handwritten one-trail, two-round fixture;
 - bit, nibble, word and absolute-round semantics;
