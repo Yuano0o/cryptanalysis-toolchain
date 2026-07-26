@@ -77,8 +77,13 @@ Improved Attacks paper.
 | B7 | Bounded one-thread/two-thread comparison with preserved semantics | [B7 details](docs/current_analysis/sat_baseline_b7.md) |
 
 See the [SAT baseline index](docs/current_analysis/sat_baseline.md) for scope
-and acceptance criteria, and [project status](docs/current_analysis/project_status.md)
-for current progress, blockers and the next action.
+and acceptance criteria. A fresh
+[credibility audit](docs/current_analysis/sat_baseline_audit.md) passed the
+baseline for continued scoped engineering use: it supports a verified
+four-round SAT witness and regression boundary, not optimality, paper-scale
+reproduction or a general performance claim. See
+[project status](docs/current_analysis/project_status.md) for current progress,
+maintenance items, blockers and the next action.
 
 **Next step:** resolve the missing GIFT differential-level materials and choose
 a bounded formal pipeline target. A1/A2 exploratory work remains frozen; see

@@ -4,6 +4,9 @@
 >
 > This is an exact baseline and regression boundary, not a claim of reproducing
 > the full *Improved Attacks on GIFT-64* paper.
+>
+> Current review decision: `passed-with-scoped-follow-ups`. See the
+> [B1-B7 credibility audit](sat_baseline_audit.md).
 
 ## Purpose
 
@@ -146,6 +149,11 @@ comparable performance baselines without rerunning the same instance.
 | B6 Regression capture | complete | Stable validated summary recorded |
 | B7 Controlled comparison | complete | Alternating 1-thread/2-thread comparison preserves verified semantics |
 
+The completed checkpoints establish a research-owned baseline derived from,
+but not guaranteed bit-for-bit identical to, the original authors'
+environment. The reusable object is the hash-pinned request, controlled
+adapter, independently verified semantic result and regression boundary.
+
 ## B2 result
 
 Implemented:
@@ -228,6 +236,11 @@ binary or machine-specific path.
 The minimal SAT baseline B0-B7 is complete. The next substantive decision is
 whether the missing GIFT differential-level materials are sufficient for a
 bounded pipeline study; do not treat B7 as a paper-level performance result.
+
+Non-blocking baseline maintenance is tracked by stable IDs in
+[sat_baseline_audit.md](sat_baseline_audit.md). Those items should be completed
+before the baseline is used for exact `UNSAT` ML labels or performance claims,
+but they do not block bounded A1/A2 parser and LC/LNC work.
 
 B3-B6 details are in [sat_baseline_b3.md](sat_baseline_b3.md),
 [sat_baseline_b4.md](sat_baseline_b4.md) and

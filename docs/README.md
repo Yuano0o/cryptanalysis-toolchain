@@ -39,6 +39,9 @@ These files reflect the latest full workspace and paper scan:
   end-to-end checker for checkpoint B6.
 - [sat_baseline_b7.md](current_analysis/sat_baseline_b7.md): bounded alternating
   one-thread/two-thread comparison and its reproducibility limits.
+- [sat_baseline_audit.md](current_analysis/sat_baseline_audit.md): current
+  credibility decision, rerun evidence, supported-claim boundary and tracked
+  maintenance follow-ups for B1-B7.
 
 ### Prior planning
 
@@ -78,3 +81,6 @@ before commit `49fd340`:
    configuration and independent validation are both available.
 9. Treat `prior_planning/` as a preserved reference set. Reconcile differences
    explicitly instead of silently merging it into the current analysis.
+10. Keep review conclusions in a durable audit file with dated evidence and
+    stable follow-up IDs. Update the root summary only when the audit decision
+    or project next step changes.

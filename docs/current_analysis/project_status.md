@@ -12,7 +12,7 @@
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
 | Stage-contract schema design | in-progress | Solver contracts and `TrailRecord` implemented and exercised; later-stage contracts remain drafts |
-| SAT baseline | complete | B0-B7 pass; B7 is a local descriptive thread comparison, not a server benchmark |
+| SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
 | Workstream A pipeline implementation | deferred | Supplementary material gaps must be resolved before formal pipeline implementation resumes |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
@@ -42,7 +42,7 @@ Completed checkpoints:
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
 | Common artifact contracts | in-progress | Solver contracts and minimal versioned `TrailRecord` implemented; later-stage fields remain specified drafts | Extend `TrailRecord` only when parser/model decoding requires it | Later representation choices need validation |
-| SAT trail search boundary | complete | B1-B7 pass; 1-thread/2-thread comparison preserves verified `SAT` with components `11`/`1` | Preserve baseline and revisit only with a defined instance suite | No baseline blocker |
+| SAT trail search boundary | complete | B1-B7 pass; live audit reruns preserved verified `SAT` with components `11`/`1` | Maintain the audit register; reuse only within its supported-claim boundary | No A1/A2 blocker |
 | `TrailInformation.out` parser | ready | Inputs available | Recover exact token boundaries and ordering | None |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
@@ -79,6 +79,19 @@ Completed checkpoints:
    pipeline target.
 2. Keep A1/A2 exploratory work frozen until that decision is recorded.
 
+## SAT baseline maintenance register
+
+The authoritative details and completion evidence are in
+[sat_baseline_audit.md](sat_baseline_audit.md).
+
+| ID | Status | Timing |
+|---|---|---|
+| SAT-AUD-01: automate the B1 restriction-table audit | open | non-blocking maintenance |
+| SAT-AUD-02: add an external GIFT reference vector | open | non-blocking maintenance |
+| SAT-AUD-03: require proof evidence for exact `UNSAT` labels | open | before ML dataset generation |
+| SAT-AUD-04: clarify source revision provenance | open | low priority |
+| SAT-AUD-05: controlled performance protocol | open | before performance/server claims |
+
 ## Change log
 
 - 2026-07-25: created project-level status tracking before baseline
@@ -103,3 +116,6 @@ Completed checkpoints:
 - 2026-07-26: completed B7 locally with alternating five-repeat 1-thread versus
   2-thread runs; both configurations remained independently verified SAT, while
   the observed local median comparison is descriptive only.
+- 2026-07-26: audited B1-B7 by static review, 39 tests, a live B6 regression
+  and a repeated B7 comparison; accepted the baseline for scoped reuse and
+  recorded five non-blocking or future-gated maintenance items.
