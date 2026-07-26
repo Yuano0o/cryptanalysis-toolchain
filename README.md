@@ -103,11 +103,10 @@ These checkpoints support a non-paper-reproduction demo. The missing original
 `KeyCandidate.out`, trail-generation provenance and proof-producing `UNSAT`
 workflow still limit stronger claims.
 
-**Next step:** harden A4 with separate 8-key smoke and 1,000-key formal-demo
-requests plus a total run budget, then add one unified A1-A5 configuration,
-pipeline runner, end-to-end regression and generated summary. Only after that
-integration boundary passes should the project record the seven-item demo
-acceptance and move to coexistence-matrix semantics. See
+**Next step:** add one unified A1-A5 configuration, pipeline runner,
+end-to-end regression and generated summary. Only after that integration
+boundary passes should the project record the seven-item demo acceptance and
+move to coexistence-matrix semantics. See
 [project status](docs/current_analysis/project_status.md) for the acceptance
 tracker and [materials status](docs/current_analysis/materials_status.md) for
 paper-reproduction blockers.
