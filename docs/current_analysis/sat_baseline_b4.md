@@ -87,12 +87,8 @@ Therefore B4 establishes only the **legacy compile-and-run boundary**. It does
 not yet satisfy the controlled adapter requirement to distinguish `SAT`,
 `UNSAT`, `UNKNOWN`, `TIMEOUT` and `ERROR`.
 
-## Next boundary
+## Subsequent boundary
 
-B5 should add a narrow owned adapter without editing upstream. It should:
-
-1. expose the solver return status explicitly;
-2. decode stdout/model data into `TrailRecord`;
-3. pass the decoded record through the B3 independent verifier;
-4. emit a versioned `SolverResult`;
-5. keep raw models, logs and binaries outside Git.
+B5 subsequently added the hash-pinned status/decode adapter, produced a
+verified `TrailRecord` and emitted a controlled `SolverResult`. See
+[sat_baseline_b5.md](sat_baseline_b5.md).

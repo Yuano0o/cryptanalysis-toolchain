@@ -11,9 +11,9 @@
 |---|---|---|
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
-| Stage-contract schema design | in-progress | Solver contracts and minimal `TrailRecord` implemented; later-stage contracts remain drafts |
-| SAT baseline | in-progress | B0-B4 complete; controlled decode/validation is next at B5 |
-| Workstream A pipeline implementation | not-started | Source map exists; parser/adapter code not created |
+| Stage-contract schema design | in-progress | Solver contracts and `TrailRecord` implemented and exercised; later-stage contracts remain drafts |
+| SAT baseline | in-progress | B0-B5 complete; compact regression capture is next at B6 |
+| Workstream A pipeline implementation | in-progress | First controlled SAT adapter is complete; differential-level stages are not implemented |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -32,8 +32,8 @@ Current checkpoint:
 4. Research-side configuration/contracts - complete.
 5. Compile/legacy smoke solve - complete with CryptoMiniSat 5.14.7.
 6. Independent verifier implementation - complete.
-7. Controlled decoding and validation of a real solver model - next at B5.
-8. Regression fixture - not started.
+7. Controlled decoding and validation of a real solver model - complete.
+8. Compact regression expectation - next at B6.
 
 ## Workstream A: Automated Differential-Level Analysis Pipeline
 
@@ -41,7 +41,7 @@ Current checkpoint:
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
 | Common artifact contracts | in-progress | Solver contracts and minimal versioned `TrailRecord` implemented; later-stage fields remain specified drafts | Extend `TrailRecord` only when parser/model decoding requires it | Later representation choices need validation |
-| SAT trail search boundary | in-progress | B1 map, B2 contracts, B3 verifier and B4 legacy smoke solve complete | Add explicit status/decode/verification adapter at B5 | Legacy source conflates non-SAT statuses |
+| SAT trail search boundary | in-progress | B1-B5 complete; controlled run returns verified `SAT` with components `11`/`1` | Capture compact B6 regression expectation | None for the four-round baseline |
 | `TrailInformation.out` parser | ready | Inputs available | Recover exact token boundaries and ordering | None |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
@@ -56,7 +56,7 @@ Current checkpoint:
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Prior-work review | complete | NeuroSAT/NeuroGIFT tasks and limitations recorded | Keep as design constraints | None |
-| Exact label contract | complete | `SolverResult` rejects non-definitive or independently unverified exact labels | Exercise with real results after B5 | Solver environment blocks data, not the contract |
+| Exact label contract | complete | B5 real result is definitive, independently verified and exact-label eligible | Preserve as benchmark evidence; do not treat one result as a dataset | None |
 | BAKSHEESH cipher boundary | ready | Encryption source and paper oracles identified | Document/test ordering and vector | None for static work |
 | BAKSHEESH exact search | blocked | Original search code absent | Request or independently rebuild later | Missing original encoding/search |
 | Runtime prediction baseline | not-started | Recommended first ML task | Define after solver telemetry exists | No controlled runtime dataset |
@@ -74,8 +74,7 @@ Current checkpoint:
 
 ## Immediate next actions
 
-1. Implement the narrow B5 controlled adapter and validate a decoded model
-   against the independent verifier.
+1. Capture the compact B6 regression expectation without committing raw output.
 2. In parallel, begin `TrailInformation.out` schema recovery because it has no
    dependency blocker.
 
@@ -94,3 +93,6 @@ Current checkpoint:
 - 2026-07-26: installed CryptoMiniSat 5.14.7 and completed B4 by compiling the
   unchanged upstream source out of tree with C++17 and running one short legacy
   smoke solve; no generated artifacts were tracked.
+- 2026-07-26: completed B5 with hash-pinned temporary status instrumentation,
+  strict four-round decoding, B3 independent verification and a controlled
+  exact-label-eligible `SAT` result with objective components `11` and `1`.

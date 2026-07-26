@@ -44,8 +44,10 @@ The two fields are not collapsed into a rounded floating-point total.
 
 The B2 request is representable but not execution-ready. Its `instance` and
 `variable_map` are null because those artifacts do not yet exist. B4 later
-recorded the selected CryptoMiniSat version as `5.14.7`; the missing artifacts
-still keep the request from being execution-ready.
+recorded the selected CryptoMiniSat version as `5.14.7`, and B5 added a `30 s`
+solver-process limit. The missing CNF-style artifacts still keep the generic
+request property from reporting execution-ready; the B5 source adapter has its
+own hash-pinned readiness checks.
 
 ## Result semantics
 
@@ -94,7 +96,8 @@ PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py' -v
 ## Subsequent boundary
 
 B3 subsequently added only the trail representation needed for an independent
-four-round GIFT verifier. B4 then installed CryptoMiniSat, compiled the legacy
-source out of tree and completed a short smoke solve. See
+four-round GIFT verifier. B4 then installed CryptoMiniSat and completed a short
+smoke solve; B5 added controlled status/decode/validation. See
 [sat_baseline_b3.md](sat_baseline_b3.md) and
-[sat_baseline_b4.md](sat_baseline_b4.md).
+[sat_baseline_b4.md](sat_baseline_b4.md) and
+[sat_baseline_b5.md](sat_baseline_b5.md).

@@ -44,7 +44,7 @@
   "request_id": "gift64-improved-attacks-differential-r4-w11-d1",
   "resources": {
     "memory_limit_mb": null,
-    "time_limit_s": null
+    "time_limit_s": 30.0
   },
   "schema_version": "solver-request/v1",
   "seed": 0,

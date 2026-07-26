@@ -31,6 +31,9 @@ These files reflect the latest full workspace and paper scan:
 - [sat_baseline_b4.md](current_analysis/sat_baseline_b4.md): CryptoMiniSat
   environment, out-of-tree compile and short legacy smoke-solve evidence for
   checkpoint B4.
+- [sat_baseline_b5.md](current_analysis/sat_baseline_b5.md): hash-pinned status
+  adapter, strict model decoding, independent verification and controlled
+  `SolverResult` evidence for checkpoint B5.
 
 ### Prior planning
 

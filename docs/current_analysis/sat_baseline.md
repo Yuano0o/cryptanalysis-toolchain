@@ -142,8 +142,8 @@ comparable performance baselines without rerunning the same instance.
 | B2 Versioned config/contracts | complete | Request/result can be represented and validated without solver execution |
 | B3 Independent verifier | complete | Hand-constructed trail and targeted invalid cases are checked independently |
 | B4 Compile and smoke solve | complete | CryptoMiniSat 5.14.7 compiled and ran the unchanged legacy source |
-| B5 Decode and validate | next | Controlled SAT model independently passes all checks |
-| B6 Regression capture | blocked | Stable validated summary recorded |
+| B5 Decode and validate | complete | Controlled SAT model independently passes all checks |
+| B6 Regression capture | next | Stable validated summary recorded |
 | B7 Controlled comparison | deferred | At least one alternative configuration compared fairly |
 
 ## B2 result
@@ -158,9 +158,9 @@ Implemented:
 - explicit `SAT`, `UNSAT`, `UNKNOWN`, `TIMEOUT` and `ERROR` result semantics;
 - independent-verification gating for exact ML labels.
 
-The request is valid but intentionally not execution-ready: `instance` and
-`variable_map` remain null. B4 records the selected solver version as
-CryptoMiniSat `5.14.7`.
+The generic request property remains intentionally not execution-ready because
+`instance` and `variable_map` are null. B4 records CryptoMiniSat `5.14.7`; B5
+adds a `30 s` limit and enforces separate hash-pinned source-adapter readiness.
 
 ## B3 result
 
@@ -187,14 +187,34 @@ C++17, then completed one short legacy smoke solve. It printed four round-state
 blocks and returned exit code `0`; generated output and binaries were not
 tracked.
 
-This does not yet satisfy the controlled result contract because the upstream
-program prints no explicit solver status and cannot distinguish `UNSAT` from
-`UNKNOWN` at its process boundary.
+The unmodified legacy process does not satisfy the controlled result contract
+because it prints no explicit solver status and cannot distinguish `UNSAT`
+from `UNKNOWN` at its process boundary. B5 resolves that observability gap in a
+temporary, hash-pinned build copy.
+
+## B5 result
+
+Implemented:
+
+- a pinned-source adapter that adds only an explicit `lbool` marker to a
+  temporary build copy;
+- strict `SAT`, `UNSAT`, `UNKNOWN`, `TIMEOUT` and `ERROR` mapping;
+- exact four-round stdout decoding into canonical `TrailRecord`;
+- content-addressed model references outside Git;
+- B3 independent verification and `SolverResult` construction;
+- a request-controlled `30 s` solver time limit.
+
+Two controlled invocations produced the same canonical model hash and
+objective semantics. The result was definitive `SAT`, recomputed to integral
+weight `11` and decimal-component count `1`, passed all independent checks and
+was exact-label eligible. No raw model, solver log or binary is tracked.
 
 ## Immediate next implementation
 
-B5 should add a narrow owned status/decode adapter, map the observed model into
-`TrailRecord`, verify it independently and emit a versioned `SolverResult`.
+B6 should capture the normalized regression expectation without committing
+the generated model. After B6, the first useful Workstream A step is the
+`TrailInformation.out` parser/schema boundary.
 
-B3 and B4 details are in [sat_baseline_b3.md](sat_baseline_b3.md) and
-[sat_baseline_b4.md](sat_baseline_b4.md).
+B3-B5 details are in [sat_baseline_b3.md](sat_baseline_b3.md),
+[sat_baseline_b4.md](sat_baseline_b4.md) and
+[sat_baseline_b5.md](sat_baseline_b5.md).
