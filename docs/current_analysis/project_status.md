@@ -13,7 +13,7 @@
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
 | Stage-contract schema design | in-progress | Solver, trail, TrailInformation, GF(2) `ConstraintSet`, space comparison, Stage 2 key corpus and bounded Stage 3 probability contracts are implemented; right-key contracts remain |
 | SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
-| Workstream A pipeline implementation | in-progress | Controlled A1-A5 runner smoke completed; coexistence and later stages remain |
+| Workstream A pipeline implementation | in-progress | Controlled A1-A5 milestone passed its explicit seven-item acceptance; coexistence and later stages remain |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -78,8 +78,7 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Perform one explicit seven-item integrated-demo acceptance.
-2. Recover the Stage 6 coexistence-matrix semantics without claiming to
+1. Recover the Stage 6 coexistence-matrix semantics without claiming to
    regenerate its missing producer artifact.
 
 ## Integrated demo acceptance tracker
@@ -93,7 +92,7 @@ Completed checkpoints:
 | Unified configuration and pipeline runner | complete | `gift64-pipeline-demo-request/v2` validates common fixture identity, shared trail position, composition mode and A4/A5 profiles; the runner has explicit execution/result/failure semantics |
 | End-to-end small regression | complete | One smoke-sized A1-A5 regression exercises the real runner when its locally documented dependencies are available |
 | Automatically generated result summary | complete | `gift64-pipeline-observation/v2` emits one provenance-preserving structured summary to standard output without tracking generated output |
-| Final acceptance after all seven items are integrated | in-progress | Implementation evidence is assembled and focused joint-review fixes are merged in PR #24; one explicit review of all seven requirements and their joint claim boundary remains |
+| Final acceptance after all seven items are integrated | complete | The [explicit acceptance audit](gift64_pipeline_acceptance_a1_a5.md) passed all seven items using static review, one expanded real integration regression and one CLI JSON-output check |
 
 ## SAT baseline maintenance register
 
@@ -176,4 +175,9 @@ The authoritative details and completion evidence are in
 - 2026-07-26: PR #24 merged the Stage 2/Stage 3/runner joint-review fixes.
   Stage 2, Stage 3, the unified runner, end-to-end regression and integrated
   summary are implemented within the documented controlled-orchestration
-  boundary; the separate seven-item final acceptance remains.
+  boundary; at that point the separate seven-item final acceptance remained.
+- 2026-07-26: executed the separate seven-item final acceptance rather than
+  inferring it from PR or component status. The expanded real acceptance
+  regression passed all seven requirements, the CLI emitted a complete
+  parseable observation, and the durable acceptance audit records the scoped
+  pass and exclusions.
