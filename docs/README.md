@@ -42,6 +42,9 @@ These files reflect the latest full workspace and paper scan:
 - [sat_baseline_audit.md](current_analysis/sat_baseline_audit.md): current
   credibility decision, rerun evidence, supported-claim boundary and tracked
   maintenance follow-ups for B1-B7.
+- [gift64_trail_information_a1.md](current_analysis/gift64_trail_information_a1.md):
+  recovered `TrailInformation.out` record/round/bit semantics, strict versioned
+  parser, provenance limits and A1 test evidence.
 
 ### Prior planning
 

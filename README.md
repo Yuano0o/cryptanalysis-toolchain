@@ -89,6 +89,27 @@ maintenance items, blockers and the next action.
 a bounded formal pipeline target. A1/A2 exploratory work remains frozen; see
 [materials status](docs/current_analysis/materials_status.md).
 
+## Current Update — GIFT-64 Pipeline A1
+
+The first differential-level artifact boundary is now explicit. A strict
+read-only parser maps the four byte-identical upstream
+`TrailInformation.out` copies into the versioned
+`gift64-trail-information/v1` corpus:
+
+- eight positional groups with four trails each;
+- eight differential rounds over the half-open interval `[5, 13)`;
+- a 128-bit key-state difference anchored at round 4;
+- four 16-bit words per 64-bit state, expanded MSB-first;
+- validated record shape, round continuity and group consistency.
+
+The file order does not match the producer's declared `GroupIndex` order, so
+the contract deliberately records `group_position` rather than inventing a
+semantic group identifier. The producer-run commands, seeds, four-trail
+selection rule and concatenation manifest remain missing. A1 therefore makes
+the supplied LC/LNC input reproducible without claiming to reproduce its
+generation. See
+[`docs/current_analysis/gift64_trail_information_a1.md`](docs/current_analysis/gift64_trail_information_a1.md).
+
 ## Planned Evaluation
 
 | Cipher | Role |
