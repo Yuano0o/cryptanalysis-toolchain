@@ -34,6 +34,7 @@ Completed checkpoints:
 6. Independent verifier implementation - complete.
 7. Controlled decoding and validation of a real solver model - complete.
 8. Compact regression expectation - complete.
+9. Controlled one-thread/two-thread comparison - complete.
 
 ## Workstream A: Automated Differential-Level Analysis Pipeline
 

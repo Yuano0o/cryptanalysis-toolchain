@@ -62,59 +62,27 @@ candidate space
 
 ## Current Update — SAT Baseline B1-B7
 
-The first six baseline checkpoints are complete. B1 maps the four-round
-GIFT-64 differential program from the Improved Attacks reference source without
-yet compiling or invoking a solver.
+The minimal four-round GIFT-64 SAT baseline is complete. It is an
+infrastructure and regression baseline, not a reproduction of the full
+Improved Attacks paper.
 
-- fixed instance: 4 rounds, integral weight bound `<= 11`, decimal-component
-  bound `<= 1`;
-- recovered size: 2,740 Boolean variables and 8,091 clauses;
-- independently checked the encoded S-box transition/weight table against the
-  GIFT DDT, with no semantic mismatches;
-- documented the permutation direction, model decoding and the need for an
-  explicit `SAT` / `UNSAT` / `UNKNOWN` result contract.
+| Part | Completed result | Details |
+|---|---|---|
+| B1 | Static variable/clause, DDT, weight, permutation and decoding map | [B1 details](docs/current_analysis/sat_baseline_static_map.md) |
+| B2 | Versioned `SolverRequest` / `SolverResult` contracts | [B2 details](docs/current_analysis/sat_baseline_b2.md) |
+| B3 | Independent GIFT-64 trail and objective verifier | [B3 details](docs/current_analysis/sat_baseline_b3.md) |
+| B4 | CryptoMiniSat 5.14.7 compile and smoke solve | [B4 details](docs/current_analysis/sat_baseline_b4.md) |
+| B5 | Controlled status, decoding and verified SAT result `11 / 1` | [B5 details](docs/current_analysis/sat_baseline_b5.md) |
+| B6 | Stable semantic regression expectation and checker | [B6 details](docs/current_analysis/sat_baseline_b6.md) |
+| B7 | Bounded one-thread/two-thread comparison with preserved semantics | [B7 details](docs/current_analysis/sat_baseline_b7.md) |
 
-B2 adds strict, versioned `SolverRequest` and `SolverResult` contracts plus a
-machine-independent GIFT-64 request configuration. The request preserves the
-integer and `0.415` weight components separately, records the B1 static counts,
-and remains explicitly not execution-ready while the CNF and variable map are
-unavailable. Contract validation also prevents timeouts or unverified results
-from becoming exact ML labels.
+See the [SAT baseline index](docs/current_analysis/sat_baseline.md) for scope
+and acceptance criteria, and [project status](docs/current_analysis/project_status.md)
+for current progress, blockers and the next action.
 
-B3 adds an independent four-round GIFT-64 trail verifier. It rebuilds the DDT
-from the published S-box, checks the permutation direction and round
-continuity, rejects malformed/zero-input trails, and recomputes both weight
-components. Its fixed structural fixture is deliberately outside the B2 bounds;
-it tests the verifier and is not presented as a baseline SAT solution.
-
-B4 records CryptoMiniSat 5.14.7, compiles the unchanged upstream source out of
-tree with C++17, and completes one short four-round legacy smoke solve. Build
-artifacts and raw solver output are not tracked.
-
-B5 adds a hash-pinned temporary status adapter without modifying upstream. It
-distinguishes `SAT`, `UNSAT`, `UNKNOWN`, `TIMEOUT` and `ERROR`, decodes the
-four-round stdout into `TrailRecord`, invokes the B3 verifier and emits
-`SolverResult`. The controlled run returned verified `SAT` with objective
-components `11` and `1`; the decoded artifact remained outside Git.
-
-B6 adds a compact semantic regression expectation. It requires the normalized
-status, objective components, verification and exact-label result while
-ignoring runtime and local paths. The observed model hash is provenance-only
-until the legacy seed is explicitly controlled. The real end-to-end B6 check
-passes without retaining generated artifacts.
-
-B7 compares the same pinned four-round instance with one and two
-CryptoMiniSat threads, in alternating order across five repetitions. Both
-configurations remain independently verified `SAT` with components `11` and
-`1`; the observed local median is descriptive only, because the legacy source
-does not set an explicit solver seed. See
-[`docs/current_analysis/sat_baseline_b7.md`](docs/current_analysis/sat_baseline_b7.md).
-
-This is an infrastructure and regression baseline, not a reproduction of the
-full Improved Attacks paper. See
-[`docs/current_analysis/sat_baseline.md`](docs/current_analysis/sat_baseline.md)
-and
-[`docs/current_analysis/sat_baseline_b6.md`](docs/current_analysis/sat_baseline_b6.md).
+**Next step:** resolve the missing GIFT differential-level materials and choose
+a bounded formal pipeline target. A1/A2 exploratory work remains frozen; see
+[materials status](docs/current_analysis/materials_status.md).
 
 ## Planned Evaluation
 
