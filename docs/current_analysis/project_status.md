@@ -78,7 +78,8 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Recover the Stage 6 coexistence-matrix semantics without claiming to
+1. Perform one explicit seven-item integrated-demo acceptance.
+2. Recover the Stage 6 coexistence-matrix semantics without claiming to
    regenerate its missing producer artifact.
 
 ## Integrated demo acceptance tracker
@@ -92,7 +93,7 @@ Completed checkpoints:
 | Unified configuration and pipeline runner | complete | `gift64-pipeline-demo-request/v2` validates common fixture identity, shared trail position, composition mode and A4/A5 profiles; the runner has explicit execution/result/failure semantics |
 | End-to-end small regression | complete | One smoke-sized A1-A5 regression exercises the real runner when its locally documented dependencies are available |
 | Automatically generated result summary | complete | `gift64-pipeline-observation/v2` emits one provenance-preserving structured summary to standard output without tracking generated output |
-| Final acceptance after all seven items are integrated | complete | Joint review fixes are merged in PR #24; 106 tests pass and the real smoke run completed all five stages with a complete result while preserving the controlled-orchestration claim boundary |
+| Final acceptance after all seven items are integrated | in-progress | Implementation evidence is assembled and focused joint-review fixes are merged in PR #24; one explicit review of all seven requirements and their joint claim boundary remains |
 
 ## SAT baseline maintenance register
 
@@ -172,7 +173,7 @@ The authoritative details and completion evidence are in
   execution from result completeness; expected subprocess failures are
   structured; and A4 now distinguishes its compile guard and caps standalone
   demo key counts.
-- 2026-07-26: accepted the seven-item integrated demo after PR #24 merged.
+- 2026-07-26: PR #24 merged the Stage 2/Stage 3/runner joint-review fixes.
   Stage 2, Stage 3, the unified runner, end-to-end regression and integrated
-  summary are complete within the documented controlled-orchestration boundary;
-  the full suite passes 106 tests and the real smoke result is complete.
+  summary are implemented within the documented controlled-orchestration
+  boundary; the separate seven-item final acceptance remains.
