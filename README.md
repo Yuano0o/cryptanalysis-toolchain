@@ -111,6 +111,21 @@ the supplied LC/LNC input reproducible without claiming to reproduce its
 generation. See
 [`docs/current_analysis/gift64_trail_information_a1.md`](docs/current_analysis/gift64_trail_information_a1.md).
 
+## Current Update — GIFT-64 Pipeline A2
+
+The LC stage now has a structured `constraint-set/v1` boundary. A
+hash-pinned temporary observation of the unchanged supplementary program maps
+its post-elimination rows into GF(2) master-key equations, evaluates fixed
+round-constant terms, computes deterministic RREF rows and assigns a semantic
+affine-space hash.
+
+The bundled fixture yields 32 distinct constraint sets with six independent
+equations per trail. The first trail agrees with the six equations in the
+supplementary linear-constraint figure. This is exact reproduction of the
+pinned legacy matrix output, not yet an independent proof of the LC algorithm.
+See
+[`docs/current_analysis/gift64_linear_constraints_a2.md`](docs/current_analysis/gift64_linear_constraints_a2.md).
+
 ## Planned Evaluation
 
 | Cipher | Role |

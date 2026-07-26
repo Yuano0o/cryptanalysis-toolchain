@@ -11,9 +11,9 @@
 |---|---|---|
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
-| Stage-contract schema design | in-progress | Solver contracts, `TrailRecord` and `gift64-trail-information/v1` are implemented and exercised; later-stage contracts remain drafts |
+| Stage-contract schema design | in-progress | Solver, trail, TrailInformation and GF(2) `ConstraintSet` contracts are implemented; LNC/right-key/probability contracts remain |
 | SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
-| Workstream A pipeline implementation | in-progress | Controlled SAT adapter and first normalized upstream artifact parser are complete; LC/LNC and later stages are not implemented |
+| Workstream A pipeline implementation | in-progress | Controlled SAT, TrailInformation and LC normalization boundaries are complete; LNC and later stages are not implemented |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
@@ -41,10 +41,10 @@ Completed checkpoints:
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
-| Common artifact contracts | in-progress | Solver contracts, minimal `TrailRecord` and `gift64-trail-information/v1` implemented | Define LC `ConstraintSet` from actual producer/consumer semantics | Later representation choices need validation |
+| Common artifact contracts | in-progress | Solver, `TrailRecord`, TrailInformation and `constraint-set/v1` implemented | Validate LNC representation before reusing/extending `ConstraintSet` | LNC semantics still need recovery |
 | SAT trail search boundary | complete | B1-B7 pass; live audit reruns preserved verified `SAT` with components `11`/`1` | Maintain the audit register; reuse only within its supported-claim boundary | No A1/A2 blocker |
 | `TrailInformation.out` parser | complete | A1 recovers 32 records, `[5,13)` rounds, round-4 key-state anchor and MSB-first order; 47-test suite passes | Use as the only normalized trail input for A2 | Exact trail selection/concatenation provenance is missing |
-| LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
+| LC extraction adapter | complete | A2 observes pinned matrices, folds fixed constants, canonicalizes GF(2) spaces; 32 sets × rank 6 | Add independent derivation after LNC scan | Current exactness is relative to pinned legacy source |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
 | Stage 2 fixed-key validation | blocked | Code inspected | Obtain/generate `KeyCandidate.out` reproducibly | Missing generator/file provenance |
 | Stage 3 probability | ready-for-static-work | Code and `KeyCandidate1000.out` present | Specify sampling/probability contract | Exact reproduction needs seed/statistical decisions |
@@ -75,9 +75,9 @@ Completed checkpoints:
 
 ## Immediate next actions
 
-1. Recover the LC output semantics and define a versioned `ConstraintSet`
-   contract against parsed trails.
-2. Add a small bounded legacy-equivalence oracle before implementing LNC.
+1. Recover the LNC matrix, auxiliary-variable and output semantics.
+2. Decide whether `constraint-set/v1` is sufficient or needs a nonlinear
+   provenance extension before implementing an LNC adapter.
 
 ## SAT baseline maintenance register
 
@@ -123,3 +123,7 @@ The authoritative details and completion evidence are in
   `gift64-trail-information/v1` parser, recovered round/word/group semantics and
   integration checks for all four immutable upstream copies; trail
   selection/concatenation provenance remains unavailable.
+- 2026-07-26: completed pipeline A2 locally with `constraint-set/v1`,
+  deterministic GF(2) RREF/semantic hashes and a hash-pinned LC observation;
+  all 32 trails yield rank 6 and the first six-equation fixture matches the
+  supplement.

@@ -45,6 +45,10 @@ These files reflect the latest full workspace and paper scan:
 - [gift64_trail_information_a1.md](current_analysis/gift64_trail_information_a1.md):
   recovered `TrailInformation.out` record/round/bit semantics, strict versioned
   parser, provenance limits and A1 test evidence.
+- [gift64_linear_constraints_a2.md](current_analysis/gift64_linear_constraints_a2.md):
+  recovered LC matrix/round-constant semantics, versioned GF(2)
+  `ConstraintSet`, semantic affine-space hashing and bounded equivalence
+  evidence.
 
 ### Prior planning
 

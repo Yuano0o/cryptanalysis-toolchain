@@ -1,5 +1,14 @@
 """Narrow boundaries around read-only reference implementations."""
 
+from .gift64_lc_legacy import (
+    GIFT64_LC_ADAPTER_VERSION,
+    GIFT64_LC_SOURCE_SHA256,
+    Gift64LCAdapterError,
+    Gift64LCObservation,
+    instrument_gift64_lc_source,
+    parse_gift64_lc_markers,
+    run_gift64_lc_observation,
+)
 from .gift64_improved_legacy import (
     ADAPTER_VERSION,
     ControlledRun,
@@ -12,10 +21,17 @@ from .gift64_improved_legacy import (
 
 __all__ = [
     "ADAPTER_VERSION",
+    "GIFT64_LC_ADAPTER_VERSION",
+    "GIFT64_LC_SOURCE_SHA256",
     "ControlledRun",
     "Gift64LegacyAdapterError",
+    "Gift64LCAdapterError",
+    "Gift64LCObservation",
     "decode_legacy_stdout",
+    "instrument_gift64_lc_source",
     "instrument_status_output",
+    "parse_gift64_lc_markers",
     "parse_status_marker",
     "run_controlled_gift64",
+    "run_gift64_lc_observation",
 ]
