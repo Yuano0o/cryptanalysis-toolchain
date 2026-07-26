@@ -32,12 +32,13 @@ It is not sufficient to reproduce the complete GIFT differential-level paper.
 | Improved Attacks source archive | partial | `../upstream/_archives/Improved_Attacks_GIFT64-main.zip`; extracted read-only source in `../upstream/Improved_Attacks_GIFT64/` | First GIFT SAT baseline | Use only as two small search references |
 | Versioned solver contracts | available | `src/shared/sat/contracts.py`; GIFT request under `experiments/gift64/` | Shared exact boundary for both workstreams | Extend only when a concrete stage requires new fields |
 | Independent GIFT-64 verifier | available | `src/shared/ciphers/gift64.py`; structural, negative and controlled-result tests | Validate decoded four-round trails without solver trust | None for the four-round baseline |
-| Controlled GIFT-64 adapter | available | `src/automated_differential_analysis/adapters/gift64_improved_legacy.py` | Explicit status, decode, verification and result contract | Capture compact B6 regression expectation |
+| Controlled GIFT-64 adapter | available | `src/automated_differential_analysis/adapters/gift64_improved_legacy.py` | Explicit status, decode, verification and result contract | None for the four-round baseline |
+| Normalized GIFT-64 regression | available | `experiments/gift64/sat_baseline_b6.regression.json`; temporary end-to-end checker | Stable semantic oracle without generated output | Revisit model-hash policy only after explicit seed control |
 | C++ compiler | available | `/usr/bin/clang++`, `/usr/bin/g++` | Native adapter/baseline compilation | None |
 | CryptoMiniSat 5 executable/API | available | Homebrew CryptoMiniSat `5.14.7`; GMP `6.3.0` | Compile and run GIFT/Improved C++ SAT code | C++17 and explicit Homebrew include/lib prefixes required |
 | CaDiCaL | missing-nonblocking | Not found in PATH | Execute Accelerating Python scripts | Defer until CaDiCaL baseline is selected |
 | Exact solver version used by each paper | partial | Papers identify solver families; local baseline now records CryptoMiniSat `5.14.7` | Fair runtime/result comparison | Treat historical runtime as non-comparable |
-| Expected output for four-round Improved differential search | available | B5 observed verified `SAT`, components `11`/`1`, canonical decoded-model hash recorded in `sat_baseline_b5.md` | Regression oracle | B6 should track only the compact expectation, not raw output |
+| Expected output for four-round Improved differential search | available | B6 compact expectation requires verified `SAT` and components `11`/`1`; raw output remains untracked | Regression oracle | None |
 
 ## Workstream A: GIFT differential-level pipeline
 

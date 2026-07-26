@@ -21,6 +21,16 @@ from .contracts import (
     VerificationStatus,
     load_solver_request,
 )
+from .regression import (
+    ModelHashPolicy,
+    REGRESSION_SCHEMA_VERSION,
+    RegressionCheck,
+    RegressionExpectation,
+    RequiredResultSummary,
+    SolverProvenance,
+    check_solver_regression,
+    load_regression_expectation,
+)
 
 __all__ = [
     "ArtifactReference",
@@ -33,13 +43,21 @@ __all__ = [
     "ObjectiveKind",
     "ObjectiveSpec",
     "ProblemKind",
+    "ModelHashPolicy",
+    "REGRESSION_SCHEMA_VERSION",
+    "RegressionCheck",
+    "RegressionExpectation",
     "ResourceLimits",
+    "RequiredResultSummary",
     "SolverRequest",
     "SolverResult",
     "SolverSpec",
     "SolverStatus",
+    "SolverProvenance",
     "SourceReference",
     "VerificationResult",
     "VerificationStatus",
+    "check_solver_regression",
+    "load_regression_expectation",
     "load_solver_request",
 ]

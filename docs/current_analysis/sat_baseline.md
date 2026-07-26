@@ -143,7 +143,7 @@ comparable performance baselines without rerunning the same instance.
 | B3 Independent verifier | complete | Hand-constructed trail and targeted invalid cases are checked independently |
 | B4 Compile and smoke solve | complete | CryptoMiniSat 5.14.7 compiled and ran the unchanged legacy source |
 | B5 Decode and validate | complete | Controlled SAT model independently passes all checks |
-| B6 Regression capture | next | Stable validated summary recorded |
+| B6 Regression capture | complete | Stable validated summary recorded |
 | B7 Controlled comparison | deferred | At least one alternative configuration compared fairly |
 
 ## B2 result
@@ -209,12 +209,28 @@ objective semantics. The result was definitive `SAT`, recomputed to integral
 weight `11` and decimal-component count `1`, passed all independent checks and
 was exact-label eligible. No raw model, solver log or binary is tracked.
 
+## B6 result
+
+Implemented:
+
+- `solver-regression-expectation/v1`;
+- a compact GIFT-64 expectation requiring the B5 normalized semantics;
+- a comparison that ignores timings, paths and diagnostic wording;
+- provenance-only model-hash handling until seed control is explicit;
+- a real end-to-end checker whose artifact root is automatically removed.
+
+The real checker returned `passed: true` with no failures or advisories. The
+checked-in expectation contains no trail states, Boolean model, solver log,
+binary or machine-specific path.
+
 ## Immediate next implementation
 
-B6 should capture the normalized regression expectation without committing
-the generated model. After B6, the first useful Workstream A step is the
-`TrailInformation.out` parser/schema boundary.
+The minimal SAT baseline B0-B6 is complete. Begin Workstream A implementation
+with the `TrailInformation.out` parser/schema boundary, then define LC/LNC
+constraint contracts. B7 controlled performance/configuration comparison
+remains deferred.
 
-B3-B5 details are in [sat_baseline_b3.md](sat_baseline_b3.md),
+B3-B6 details are in [sat_baseline_b3.md](sat_baseline_b3.md),
 [sat_baseline_b4.md](sat_baseline_b4.md) and
-[sat_baseline_b5.md](sat_baseline_b5.md).
+[sat_baseline_b5.md](sat_baseline_b5.md) and
+[sat_baseline_b6.md](sat_baseline_b6.md).

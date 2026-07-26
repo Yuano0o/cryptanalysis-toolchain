@@ -60,9 +60,9 @@ candidate space
   → verified result
 ```
 
-## Current Update — SAT Baseline B1-B5
+## Current Update — SAT Baseline B1-B6
 
-The first five baseline checkpoints are complete. B1 maps the four-round
+The first six baseline checkpoints are complete. B1 maps the four-round
 GIFT-64 differential program from the Improved Attacks reference source without
 yet compiling or invoking a solver.
 
@@ -97,11 +97,17 @@ four-round stdout into `TrailRecord`, invokes the B3 verifier and emits
 `SolverResult`. The controlled run returned verified `SAT` with objective
 components `11` and `1`; the decoded artifact remained outside Git.
 
+B6 adds a compact semantic regression expectation. It requires the normalized
+status, objective components, verification and exact-label result while
+ignoring runtime and local paths. The observed model hash is provenance-only
+until the legacy seed is explicitly controlled. The real end-to-end B6 check
+passes without retaining generated artifacts.
+
 This is an infrastructure and regression baseline, not a reproduction of the
 full Improved Attacks paper. See
 [`docs/current_analysis/sat_baseline.md`](docs/current_analysis/sat_baseline.md)
 and
-[`docs/current_analysis/sat_baseline_b5.md`](docs/current_analysis/sat_baseline_b5.md).
+[`docs/current_analysis/sat_baseline_b6.md`](docs/current_analysis/sat_baseline_b6.md).
 
 ## Planned Evaluation
 

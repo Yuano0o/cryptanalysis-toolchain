@@ -12,19 +12,19 @@
 | Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
 | Stage-contract schema design | in-progress | Solver contracts and `TrailRecord` implemented and exercised; later-stage contracts remain drafts |
-| SAT baseline | in-progress | B0-B5 complete; compact regression capture is next at B6 |
+| SAT baseline | complete | B0-B6 pass; B7 performance/configuration comparison is deferred |
 | Workstream A pipeline implementation | in-progress | First controlled SAT adapter is complete; differential-level stages are not implemented |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
 | CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
 
-## Current milestone
+## Completed milestone
 
-**Milestone:** establish a minimal exact GIFT-64 SAT baseline from
+**Milestone:** established a minimal exact GIFT-64 SAT baseline from
 `../upstream/Improved_Attacks_GIFT64/Differential.cpp`, archived in
 `../upstream/_archives/Improved_Attacks_GIFT64-main.zip`.
 
-Current checkpoint:
+Completed checkpoints:
 
 1. Source and paper relationship inspected - complete.
 2. Baseline target and acceptance criteria - complete.
@@ -33,7 +33,7 @@ Current checkpoint:
 5. Compile/legacy smoke solve - complete with CryptoMiniSat 5.14.7.
 6. Independent verifier implementation - complete.
 7. Controlled decoding and validation of a real solver model - complete.
-8. Compact regression expectation - next at B6.
+8. Compact regression expectation - complete.
 
 ## Workstream A: Automated Differential-Level Analysis Pipeline
 
@@ -41,7 +41,7 @@ Current checkpoint:
 |---|---|---|---|---|
 | Source/paper map | complete | Six GIFT stages mapped to the three-stage/differential-level methods | Maintain as evidence changes | None |
 | Common artifact contracts | in-progress | Solver contracts and minimal versioned `TrailRecord` implemented; later-stage fields remain specified drafts | Extend `TrailRecord` only when parser/model decoding requires it | Later representation choices need validation |
-| SAT trail search boundary | in-progress | B1-B5 complete; controlled run returns verified `SAT` with components `11`/`1` | Capture compact B6 regression expectation | None for the four-round baseline |
+| SAT trail search boundary | complete | B1-B6 pass; normalized regression requires verified `SAT` with components `11`/`1` | Preserve while building the next pipeline stage | None for the four-round baseline |
 | `TrailInformation.out` parser | ready | Inputs available | Recover exact token boundaries and ordering | None |
 | LC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` equivalence oracle | None |
 | LNC extraction adapter | ready | Source and fixture available; no external solver | Define `ConstraintSet` provenance | None |
@@ -74,9 +74,8 @@ Current checkpoint:
 
 ## Immediate next actions
 
-1. Capture the compact B6 regression expectation without committing raw output.
-2. In parallel, begin `TrailInformation.out` schema recovery because it has no
-   dependency blocker.
+1. Recover and implement the `TrailInformation.out` schema/parser boundary.
+2. Define LC/LNC constraint contracts against parsed trails.
 
 ## Change log
 
@@ -96,3 +95,6 @@ Current checkpoint:
 - 2026-07-26: completed B5 with hash-pinned temporary status instrumentation,
   strict four-round decoding, B3 independent verification and a controlled
   exact-label-eligible `SAT` result with objective components `11` and `1`.
+- 2026-07-26: completed B6 with a normalized semantic expectation and
+  temporary-artifact end-to-end checker; status, objective and verification are
+  hard requirements while runtime and the uncontrolled-seed model hash are not.

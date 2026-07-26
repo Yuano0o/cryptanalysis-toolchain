@@ -34,6 +34,9 @@ These files reflect the latest full workspace and paper scan:
 - [sat_baseline_b5.md](current_analysis/sat_baseline_b5.md): hash-pinned status
   adapter, strict model decoding, independent verification and controlled
   `SolverResult` evidence for checkpoint B5.
+- [sat_baseline_b6.md](current_analysis/sat_baseline_b6.md): normalized semantic
+  regression expectation, non-deterministic-field policy and temporary
+  end-to-end checker for checkpoint B6.
 
 ### Prior planning
 

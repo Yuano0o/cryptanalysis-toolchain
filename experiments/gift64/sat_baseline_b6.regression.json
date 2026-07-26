@@ -1,0 +1,27 @@
+{
+  "adapter_version": "gift64-improved-legacy-adapter/v1",
+  "expectation_id": "gift64-improved-attacks-r4-b6",
+  "model_hash_policy": "record_only",
+  "observed_model_sha256": "8e42de961476884641e53b2e15b1596f920aa84b3bcb4ff22fc8c7d9b47bac87",
+  "request_id": "gift64-improved-attacks-differential-r4-w11-d1",
+  "request_sha256": "6a163de288a8d2c51d8a0f75ca630c1fc569617bb756287585bd4137741dac86",
+  "required": {
+    "definitive": true,
+    "exact_label_eligible": true,
+    "objective_components": {
+      "decimal_weight_count": 1,
+      "integral_weight": 11
+    },
+    "satisfied_bound": true,
+    "status": "SAT",
+    "verification_status": "passed"
+  },
+  "schema_version": "solver-regression-expectation/v1",
+  "solver": {
+    "name": "cryptominisat",
+    "threads": 1,
+    "version": "5.14.7"
+  },
+  "source_sha256": "92b12fd9c65f5870c8f43b0b2e824c4afe789436290cc22e49d238362440c25c",
+  "verifier_version": "gift64-four-round-verifier/v1"
+}

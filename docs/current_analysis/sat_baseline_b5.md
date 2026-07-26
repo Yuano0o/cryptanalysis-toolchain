@@ -128,10 +128,9 @@ The actual CryptoMiniSat integration was also run twice with equivalent
 verified results. Raw stdout, binaries, model files and result logs remain
 untracked.
 
-## Next boundary
+## Subsequent boundary
 
-B6 should capture only a compact, non-generated regression expectation: request
-ID, adapter/verifier versions, normalized status and objective components. The
-observed canonical model hash can remain provenance, but should not be treated
-as cross-environment determinism until seed control is explicit. B6 must not
-add the raw model or solver log to Git.
+B6 subsequently added the normalized regression expectation and an end-to-end
+temporary-artifact checker. The observed model hash remains provenance rather
+than a hard cross-environment oracle. See
+[sat_baseline_b6.md](sat_baseline_b6.md).
