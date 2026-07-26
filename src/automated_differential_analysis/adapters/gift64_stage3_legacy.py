@@ -48,12 +48,27 @@ _FIXED_BITS_DEFINE = "#define RandomFixBitNum 21"
 _KEY_DEFINE = "#define TargetKeyIndex 0"
 _TRAIL_DEFINE = "#define TestTrailIndex 0"
 _RANDOM_DEVICE_LINE = "                random_device rand;"
+_SOLUTION_COUNTER_LINE = "                int Solution = 0;"
+_SOLUTION_ENUMERATION_BLOCK = """                    if (ret == l_True)
+                    {
+                        Solution += 1;
+                        // Delete solution
+                        clause.clear();
+                        for (size_t bit = 0; bit < 64; bit++)
+                        {
+                            if (solver.get_model()[xin_pair1[0][bit]] != l_Undef)
+                            {
+                                clause.push_back(Lit(xin_pair1[0][bit], solver.get_model()[xin_pair1[0][bit]] == l_True));
+                            }
+                        }
+                        solver.add_clause(clause);
+                    }"""
 _COUNT_LINE = '                cout<<"Number of Solution: "<<(dec)<<Solution << endl;'
 _SAMPLE_PREFIX = "LGCA_STAGE3_SAMPLE="
 _SAMPLE_RE = re.compile(
     r"^LGCA_STAGE3_SAMPLE=(?P<sample>[0-9]+);key=(?P<key>[0-9]+);"
     r"trail=(?P<trail>[0-9]+);fixed=(?P<fixed>[0-9:,]*);"
-    r"solutions=(?P<solutions>[0-9]+);terminal=(?P<terminal>UNSAT|UNKNOWN)$"
+    r"solutions=(?P<solutions>[0-9]+);terminal=(?P<terminal>UNSAT|UNKNOWN|ERROR)$"
 )
 _SOLVER_VERSION_RE = re.compile(r"CryptoMiniSat version ([0-9][0-9.]*)")
 
@@ -131,6 +146,7 @@ class Gift64Stage3Observation:
     solver_version: str
     instrumented_source_sha256: str
     compile_wall_time_s: float
+    run_wall_time_s: float
     samples: tuple[Gift64Stage3SampleResult, ...]
     estimate: SubcubeProbabilityEstimate | None
 
@@ -151,6 +167,8 @@ class Gift64Stage3Observation:
                 raise Gift64Stage3AdapterError(f"{field_name} must be a SHA-256")
         if self.compile_wall_time_s < 0:
             raise Gift64Stage3AdapterError("compile_wall_time_s must be non-negative")
+        if self.run_wall_time_s < 0:
+            raise Gift64Stage3AdapterError("run_wall_time_s must be non-negative")
         if len(self.samples) != self.request.repeat_count:
             raise Gift64Stage3AdapterError("sample count must match request repeats")
         if tuple(item.sample_index for item in self.samples) != tuple(
@@ -165,6 +183,14 @@ class Gift64Stage3Observation:
             raise Gift64Stage3AdapterError(
                 "complete sample fixed-bit counts must match request"
             )
+        if any(
+            item.solution_count is not None
+            and item.solution_count > self.request.subcube_size
+            for item in self.samples
+        ):
+            raise Gift64Stage3AdapterError(
+                "sample solution count exceeds the configured subcube size"
+            )
         complete = tuple(
             item.solution_count
             for item in self.samples
@@ -173,6 +199,18 @@ class Gift64Stage3Observation:
         if self.estimate is not None and len(complete) != len(self.samples):
             raise Gift64Stage3AdapterError(
                 "an estimate is invalid when any sample is incomplete"
+            )
+        if len(complete) == len(self.samples):
+            expected_estimate = estimate_subcube_probability(
+                complete, fixed_bit_count=self.request.fixed_bit_count
+            )
+            if self.estimate != expected_estimate:
+                raise Gift64Stage3AdapterError(
+                    "estimate must exactly match all complete sample counts"
+                )
+        elif self.estimate is not None:
+            raise Gift64Stage3AdapterError(
+                "an incomplete observation must not carry an estimate"
             )
 
     def summary_dict(self) -> dict[str, Any]:
@@ -191,6 +229,8 @@ class Gift64Stage3Observation:
             "solver_version": self.solver_version,
             "instrumented_source_sha256": self.instrumented_source_sha256,
             "compile_wall_time_s": self.compile_wall_time_s,
+            "run_wall_time_s": self.run_wall_time_s,
+            "total_time_limit_s": self.request.total_time_limit_s,
             "status_counts": status_counts,
             "estimate": None if self.estimate is None else self.estimate.to_dict(),
             "samples": [item.to_dict() for item in self.samples],
@@ -230,6 +270,8 @@ def instrument_gift64_stage3_source(
         _KEY_DEFINE,
         _TRAIL_DEFINE,
         _RANDOM_DEVICE_LINE,
+        _SOLUTION_COUNTER_LINE,
+        _SOLUTION_ENUMERATION_BLOCK,
         _COUNT_LINE,
     )
     if any(text.count(anchor) != 1 for anchor in anchors):
@@ -252,6 +294,36 @@ def instrument_gift64_stage3_source(
                 mt19937_64 rand(0x{request.sampling_seed:016x}ULL ^
                     (lgca_sample_index * 0x9e3779b97f4a7c15ULL));"""
     text = text.replace(_RANDOM_DEVICE_LINE, deterministic_rng, 1)
+    checked_counter = """                unsigned long long Solution = 0ULL;
+                bool lgca_undefined_xin_model_bit = false;"""
+    text = text.replace(_SOLUTION_COUNTER_LINE, checked_counter, 1)
+    checked_enumeration = """                    if (ret == l_True)
+                    {
+                        bool lgca_all_xin_bits_defined = true;
+                        for (size_t bit = 0; bit < 64; bit++)
+                        {
+                            if (solver.get_model()[xin_pair1[0][bit]] == l_Undef)
+                            {
+                                lgca_all_xin_bits_defined = false;
+                                break;
+                            }
+                        }
+                        if (!lgca_all_xin_bits_defined)
+                        {
+                            lgca_undefined_xin_model_bit = true;
+                            ret = l_Undef;
+                            break;
+                        }
+                        Solution += 1ULL;
+                        // Delete exactly one fully defined 64-bit input assignment.
+                        clause.clear();
+                        for (size_t bit = 0; bit < 64; bit++)
+                        {
+                            clause.push_back(Lit(xin_pair1[0][bit], solver.get_model()[xin_pair1[0][bit]] == l_True));
+                        }
+                        solver.add_clause(clause);
+                    }"""
+    text = text.replace(_SOLUTION_ENUMERATION_BLOCK, checked_enumeration, 1)
     marker = """                cerr<<"LGCA_STAGE3_SAMPLE="<<lgca_sample_index
                     <<";key="<<testkeyindex<<";trail="<<trail<<";fixed=";
                 for (int bit = 0; bit < RandomFixBitNum; bit++)
@@ -263,7 +335,11 @@ def instrument_gift64_stage3_source(
                     cerr<<RandomFixBitIndex[bit]<<":"<<RandomFixValue[bit];
                 }
                 cerr<<";solutions="<<Solution<<";terminal=";
-                if (ret == l_False)
+                if (lgca_undefined_xin_model_bit)
+                {
+                    cerr<<"ERROR";
+                }
+                else if (ret == l_False)
                 {
                     cerr<<"UNSAT";
                 }
@@ -367,6 +443,8 @@ def _run_one_sample(
     *,
     request: Gift64Stage3ProbabilityRequest,
     sample_index: int,
+    time_limit_s: float,
+    timeout_reason: str,
 ) -> Gift64Stage3SampleResult:
     before_cpu = os.times()
     start = time.monotonic()
@@ -378,7 +456,7 @@ def _run_one_sample(
             check=False,
             capture_output=True,
             text=True,
-            timeout=request.per_sample_time_limit_s,
+            timeout=time_limit_s,
         )
     except subprocess.TimeoutExpired:
         return Gift64Stage3SampleResult(
@@ -390,7 +468,7 @@ def _run_one_sample(
             cpu_time_s=_cpu_time(before_cpu, os.times()),
             exit_code=None,
             stdout_sha256=None,
-            diagnostics=("Stage 3 process exceeded per-sample timeout",),
+            diagnostics=(timeout_reason,),
         )
     wall_time_s = time.monotonic() - start
     cpu_time_s = _cpu_time(before_cpu, os.times())
@@ -427,6 +505,21 @@ def _run_one_sample(
             stdout_sha256=stdout_sha256,
             diagnostics=(str(exc),),
         )
+    if terminal is SolverStatus.ERROR:
+        return Gift64Stage3SampleResult(
+            sample_index=sample_index,
+            terminal_status=terminal,
+            fixed_assignments=assignments,
+            solution_count=None,
+            wall_time_s=wall_time_s,
+            cpu_time_s=cpu_time_s,
+            exit_code=completed.returncode,
+            stdout_sha256=stdout_sha256,
+            diagnostics=(
+                "native enumeration stopped because at least one xin_pair1[0] "
+                "model bit was undefined; partial count discarded",
+            ),
+        )
     return Gift64Stage3SampleResult(
         sample_index=sample_index,
         terminal_status=terminal,
@@ -439,6 +532,20 @@ def _run_one_sample(
         diagnostics=(
             "solution enumeration ended with native status from temporary instrumentation",
         ),
+    )
+
+
+def _total_budget_timeout_result(sample_index: int) -> Gift64Stage3SampleResult:
+    return Gift64Stage3SampleResult(
+        sample_index=sample_index,
+        terminal_status=SolverStatus.TIMEOUT,
+        fixed_assignments=(),
+        solution_count=None,
+        wall_time_s=0.0,
+        cpu_time_s=0.0,
+        exit_code=None,
+        stdout_sha256=None,
+        diagnostics=("Stage 3 total run time budget was exhausted",),
     )
 
 
@@ -458,6 +565,7 @@ def run_gift64_stage3_probability_demo(
         raise Gift64Stage3AdapterError(
             "request must be a Gift64Stage3ProbabilityRequest"
         )
+    run_start = time.monotonic()
     source = source_path.read_bytes()
     instrumented = instrument_gift64_stage3_source(source, request=request)
     corpus: Gift64TrailInformationCorpus = parse_gift64_trail_information(
@@ -504,6 +612,13 @@ def run_gift64_stage3_probability_demo(
             "-o",
             str(executable),
         ]
+        remaining_before_compile = request.total_time_limit_s - (
+            time.monotonic() - run_start
+        )
+        if remaining_before_compile <= 0:
+            raise Gift64Stage3AdapterError(
+                "Stage 3 total run time budget was exhausted before compilation"
+            )
         compile_start = time.monotonic()
         try:
             compiled = subprocess.run(
@@ -511,7 +626,7 @@ def run_gift64_stage3_probability_demo(
                 check=False,
                 capture_output=True,
                 text=True,
-                timeout=60,
+                timeout=min(60.0, remaining_before_compile),
             )
         except subprocess.TimeoutExpired as exc:
             raise Gift64Stage3AdapterError(
@@ -522,12 +637,32 @@ def run_gift64_stage3_probability_demo(
             raise Gift64Stage3AdapterError(
                 "temporary Stage 3 compilation failed: " + compiled.stderr.strip()
             )
-        samples = tuple(
-            _run_one_sample(
-                executable, build_root, request=request, sample_index=sample_index
+        sample_results: list[Gift64Stage3SampleResult] = []
+        for sample_index in range(request.repeat_count):
+            remaining = request.total_time_limit_s - (time.monotonic() - run_start)
+            if remaining <= 0:
+                sample_results.extend(
+                    _total_budget_timeout_result(index)
+                    for index in range(sample_index, request.repeat_count)
+                )
+                break
+            time_limit_s = min(request.per_sample_time_limit_s, remaining)
+            timeout_reason = (
+                "Stage 3 total run time budget was exhausted during this sample"
+                if remaining < request.per_sample_time_limit_s
+                else "Stage 3 process exceeded per-sample timeout"
             )
-            for sample_index in range(request.repeat_count)
-        )
+            sample_results.append(
+                _run_one_sample(
+                    executable,
+                    build_root,
+                    request=request,
+                    sample_index=sample_index,
+                    time_limit_s=time_limit_s,
+                    timeout_reason=timeout_reason,
+                )
+            )
+        samples = tuple(sample_results)
     complete_counts = tuple(
         item.solution_count
         for item in samples
@@ -547,6 +682,7 @@ def run_gift64_stage3_probability_demo(
         solver_version=solver_version,
         instrumented_source_sha256=_sha256(instrumented),
         compile_wall_time_s=compile_wall_time_s,
+        run_wall_time_s=time.monotonic() - run_start,
         samples=samples,
         estimate=estimate,
     )

@@ -16,14 +16,18 @@ provided KeyCandidate1000.out fixture (read-only, hash-pinned)
   + supplied TrailInformation.out record position
   + deterministic 21-bit input restriction per sample
   -> enumerate all surviving first-round input states in that subcube
-  -> complete count only when native enumeration ends UNSAT
-  -> mean(count / 2^43), with a descriptive sample interval when n >= 2
+  -> complete count only when native enumeration ends UNSAT and all 64 target
+     input bits are defined in every enumerated model
+  -> mean(count / 2^43), with descriptive dispersion only
 ```
 
 The tracked request
 [`experiments/gift64/stage3_probability_a5.request.json`](../../experiments/gift64/stage3_probability_a5.request.json)
-uses fixture key position 0, physical trail-record position 0, eight
-deterministic subcube samples, 21 fixed bits and a 30-second limit per sample.
+uses fixture key position 0, physical trail-record position 0, the legacy
+default of 100 deterministic subcube samples, 21 fixed bits, a 30-second limit
+per sample and a 300-second total wall-time budget. The separate
+[`experiments/gift64/stage3_probability_smoke_a5.request.json`](../../experiments/gift64/stage3_probability_smoke_a5.request.json)
+retains eight samples and a 60-second total budget for smoke testing.
 Run it from the repository root with:
 
 ```bash
@@ -71,10 +75,14 @@ anchor. It changes only the experiment controls:
 1. binds the legacy loop to one configured fixture-key position and one
    configured physical trail-record position;
 2. changes the repeat loop to one sample per process, so the process timeout is
-   unambiguously per sample;
+   unambiguously per sample, and enforces a request-level total wall-time
+   budget across compilation and every sample;
 3. replaces `std::random_device` with `mt19937_64`, seeded from the request
    seed and a per-process sample index; and
-4. emits a marker containing the sampled bit/value restriction, solution count
+4. replaces the legacy 32-bit solution counter with an unsigned 64-bit counter,
+   requires all 64 blocked `xin_pair1[0]` model bits to be defined, and emits a
+   controlled `ERROR` marker if that completeness condition fails; and
+5. emits a marker containing the sampled bit/value restriction, solution count
    and terminal enumeration status.
 
 The GIFT model, DDT construction, key schedule, clauses, solver calls and
@@ -83,15 +91,19 @@ solution-blocking loop remain in the legacy execution path.
 ## Completion and statistical policy
 
 A sample contributes to the estimate only when its solution-blocking loop
-terminates with native `UNSAT`: that means the temporary process exhausted the
-solutions for its selected subcube. `UNKNOWN`, process `TIMEOUT`, marker error
-or nonzero exit makes the whole estimate unavailable rather than silently
-treating the partial count as exact.
+terminates with native `UNSAT` and every blocked model had a fully defined
+64-bit `xin_pair1[0]` assignment. That means the temporary process exhausted
+the distinct target-input states for its selected subcube. `UNKNOWN`, process
+`TIMEOUT`, undefined-model `ERROR`, marker error or nonzero exit makes the
+whole estimate unavailable rather than silently treating a partial count as
+exact.
 
-With at least two complete samples, A5 additionally emits a normal-approximate
-95% interval over the sample fractions. This is descriptive only: the samples
-are deterministic pseudo-random subcubes, are too few for a strong asymptotic
-claim in the default configuration, and are not PAC approximate model counts.
+A5 emits the point estimate, sample minimum/maximum and sample standard
+deviation when at least two samples complete. It deliberately does **not** emit
+a confidence interval: deterministic pseudo-random subcubes and especially
+all-zero samples do not justify a zero-width "95%" interval or a claim that the
+underlying probability is zero. These values are not PAC approximate model
+counts or certified probability bounds.
 
 The provided `KeyCandidate1000.out` file is an upstream fixture, not a corpus
 we generated. Its random-generation algorithm, seed, distribution and relation
@@ -107,12 +119,12 @@ Implementation:
 - `src/automated_differential_analysis/adapters/gift64_stage3_legacy.py`
 - `scripts/run_gift64_stage3_probability_demo.py`
 
-Tests cover request limits, estimator arithmetic, impossible counts,
-hash-pinned instrumentation, exact marker parsing and a real fixture-backed
-integration run. The integration test executes the same one-sample request
-twice and requires identical sampled restrictions, terminal status and solution
-count. A local eight-sample run of the tracked request completed under its
-limits; its generated values are intentionally not committed.
+Tests cover request limits, finite resource budgets, estimator arithmetic,
+impossible counts, hash-pinned instrumentation, exact marker parsing including
+the undefined-model error state, and a real fixture-backed integration run. The
+integration test executes the same one-sample request twice and requires
+identical sampled restrictions, terminal status and solution count. Generated
+values are intentionally not committed.
 
 ## Reporting language and boundaries
 
@@ -126,8 +138,8 @@ The supported wording is:
 
 Do not state that A5:
 
-- reproduces the authors' original entropy sequence, all 100 repetitions, all
-  1,000 fixture keys or any paper table/result;
+- reproduces the authors' original entropy sequence, all 1,000 fixture keys or
+  any paper table/result;
 - proves that the fixture is representative, independently regenerable or a
   subset of `KeyCandidate.out`;
 - produces an exact global probability, an exact model count, a PAC guarantee
@@ -137,7 +149,7 @@ Do not state that A5:
 
 ## Next boundary
 
-For a stronger demo, choose an explicit total time budget and then extend the
-request across selected fixture-key positions and physical trail-record
-positions. Any aggregation must report its conditioning and assumptions rather
-than summing per-trail estimates as if they were automatically independent.
+For a stronger demo, extend the explicitly budgeted request across selected
+fixture-key positions and physical trail-record positions. Any aggregation must
+report its conditioning and assumptions rather than summing per-trail estimates
+as if they were automatically independent.

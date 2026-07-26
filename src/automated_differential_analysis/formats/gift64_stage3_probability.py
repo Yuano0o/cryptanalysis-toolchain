@@ -5,15 +5,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal, localcontext
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
 
 GIFT64_STAGE3_PROBABILITY_REQUEST_SCHEMA_VERSION = (
-    "gift64-stage3-probability-request/v1"
+    "gift64-stage3-probability-request/v2"
 )
 GIFT64_STAGE3_PROBABILITY_OBSERVATION_SCHEMA_VERSION = (
-    "gift64-stage3-probability-observation/v1"
+    "gift64-stage3-probability-observation/v2"
 )
 
 
@@ -61,7 +62,12 @@ def _require_integer_range(
 
 
 def _require_positive_number(value: Any, field_name: str) -> float:
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or (isinstance(value, float) and not math.isfinite(value))
+        or value <= 0
+    ):
         raise Gift64Stage3ProbabilityError(
             f"{field_name} must be a positive number"
         )
@@ -82,6 +88,7 @@ class Gift64Stage3ProbabilityRequest:
     solver_name: str
     solver_version: str
     per_sample_time_limit_s: float
+    total_time_limit_s: float
 
     def __post_init__(self) -> None:
         if self.schema_version != GIFT64_STAGE3_PROBABILITY_REQUEST_SCHEMA_VERSION:
@@ -98,6 +105,7 @@ class Gift64Stage3ProbabilityRequest:
         _require_positive_number(
             self.per_sample_time_limit_s, "per_sample_time_limit_s"
         )
+        _require_positive_number(self.total_time_limit_s, "total_time_limit_s")
 
     @property
     def free_bit_count(self) -> int:
@@ -121,7 +129,8 @@ class Gift64Stage3ProbabilityRequest:
                 "version": self.solver_version,
             },
             "resources": {
-                "per_sample_time_limit_s": self.per_sample_time_limit_s
+                "per_sample_time_limit_s": self.per_sample_time_limit_s,
+                "total_time_limit_s": self.total_time_limit_s,
             },
         }
 
@@ -151,7 +160,11 @@ class Gift64Stage3ProbabilityRequest:
         solver = _expect_mapping(data["solver"], "solver")
         _expect_exact_keys(solver, {"name", "version"}, "solver")
         resources = _expect_mapping(data["resources"], "resources")
-        _expect_exact_keys(resources, {"per_sample_time_limit_s"}, "resources")
+        _expect_exact_keys(
+            resources,
+            {"per_sample_time_limit_s", "total_time_limit_s"},
+            "resources",
+        )
         return cls(
             schema_version=data["schema_version"],
             request_id=data["request_id"],
@@ -163,6 +176,7 @@ class Gift64Stage3ProbabilityRequest:
             solver_name=solver["name"],
             solver_version=solver["version"],
             per_sample_time_limit_s=resources["per_sample_time_limit_s"],
+            total_time_limit_s=resources["total_time_limit_s"],
         )
 
     @classmethod
@@ -190,8 +204,9 @@ class SubcubeProbabilityEstimate:
     fixed_bit_count: int
     solution_count_total: int
     point_estimate: Decimal
-    normal_95_lower: Decimal | None
-    normal_95_upper: Decimal | None
+    sample_standard_deviation: Decimal | None
+    sample_fraction_minimum: Decimal
+    sample_fraction_maximum: Decimal
 
     def to_dict(self) -> dict[str, str | int | None]:
         return {
@@ -199,12 +214,13 @@ class SubcubeProbabilityEstimate:
             "fixed_bit_count": self.fixed_bit_count,
             "solution_count_total": self.solution_count_total,
             "point_estimate": format(self.point_estimate, "f"),
-            "normal_95_lower": (
-                None if self.normal_95_lower is None else format(self.normal_95_lower, "f")
+            "sample_standard_deviation": (
+                None
+                if self.sample_standard_deviation is None
+                else format(self.sample_standard_deviation, "f")
             ),
-            "normal_95_upper": (
-                None if self.normal_95_upper is None else format(self.normal_95_upper, "f")
-            ),
+            "sample_fraction_minimum": format(self.sample_fraction_minimum, "f"),
+            "sample_fraction_maximum": format(self.sample_fraction_maximum, "f"),
         }
 
 
@@ -213,9 +229,9 @@ def estimate_subcube_probability(
 ) -> SubcubeProbabilityEstimate:
     """Estimate probability as mean(count / 2^(64-fixed bits)).
 
-    The optional interval is a descriptive normal approximation across complete
-    deterministic pseudo-random subcube samples. It is not a certified PAC or
-    exact counting bound.
+    The dispersion fields are descriptive summaries across complete deterministic
+    pseudo-random subcube samples. They are not confidence intervals, PAC bounds
+    or exact counting bounds.
     """
 
     _require_integer_range(fixed_bit_count, "fixed_bit_count", 1, 63)
@@ -237,20 +253,18 @@ def estimate_subcube_probability(
         context.prec = 50
         values = tuple(Decimal(value) / Decimal(subcube_size) for value in solution_counts)
         mean = sum(values) / Decimal(len(values))
-        lower: Decimal | None = None
-        upper: Decimal | None = None
+        standard_deviation: Decimal | None = None
         if len(values) >= 2:
             variance = sum((value - mean) ** 2 for value in values) / Decimal(
                 len(values) - 1
             )
-            margin = Decimal("1.96") * (variance / Decimal(len(values))).sqrt()
-            lower = max(Decimal(0), mean - margin)
-            upper = min(Decimal(1), mean + margin)
+            standard_deviation = variance.sqrt()
         return SubcubeProbabilityEstimate(
             completed_sample_count=len(values),
             fixed_bit_count=fixed_bit_count,
             solution_count_total=sum(solution_counts),
             point_estimate=mean,
-            normal_95_lower=lower,
-            normal_95_upper=upper,
+            sample_standard_deviation=standard_deviation,
+            sample_fraction_minimum=min(values),
+            sample_fraction_maximum=max(values),
         )

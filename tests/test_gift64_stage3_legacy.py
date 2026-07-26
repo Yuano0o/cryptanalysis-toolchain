@@ -24,6 +24,21 @@ SYNTHETIC_SOURCE = b"""#define RepeatTestTime 100
 #define TargetKeyIndex 0
 #define TestTrailIndex 0
                 random_device rand;
+                int Solution = 0;
+                    if (ret == l_True)
+                    {
+                        Solution += 1;
+                        // Delete solution
+                        clause.clear();
+                        for (size_t bit = 0; bit < 64; bit++)
+                        {
+                            if (solver.get_model()[xin_pair1[0][bit]] != l_Undef)
+                            {
+                                clause.push_back(Lit(xin_pair1[0][bit], solver.get_model()[xin_pair1[0][bit]] == l_True));
+                            }
+                        }
+                        solver.add_clause(clause);
+                    }
                 cout<<"Number of Solution: "<<(dec)<<Solution << endl;
 """
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -38,7 +53,7 @@ STAGE3_ROOT = (
 
 def request() -> Gift64Stage3ProbabilityRequest:
     return Gift64Stage3ProbabilityRequest(
-        "gift64-stage3-probability-request/v1",
+        "gift64-stage3-probability-request/v2",
         "gift64-stage3-test",
         3,
         7,
@@ -48,6 +63,7 @@ def request() -> Gift64Stage3ProbabilityRequest:
         "cryptominisat",
         "5.14.7",
         30.0,
+        60.0,
     )
 
 
@@ -69,6 +85,8 @@ class Gift64Stage3AdapterTests(unittest.TestCase):
         self.assertIn("#define TargetKeyIndex 3", text)
         self.assertIn("#define TestTrailIndex 7", text)
         self.assertIn("LGCA_STAGE3_SAMPLE_INDEX", text)
+        self.assertIn("unsigned long long Solution = 0ULL", text)
+        self.assertIn("lgca_all_xin_bits_defined", text)
         self.assertEqual(text.count("LGCA_STAGE3_SAMPLE="), 1)
 
     def test_unpinned_source_is_rejected(self) -> None:
@@ -94,6 +112,16 @@ class Gift64Stage3AdapterTests(unittest.TestCase):
                 expected_trail_position=7,
                 expected_fixed_bit_count=2,
             )
+        terminal, assignments, count = parse_stage3_sample_marker(
+            "LGCA_STAGE3_SAMPLE=4;key=3;trail=7;fixed=0:1,5:0;solutions=17;terminal=ERROR\n",
+            expected_sample_index=4,
+            expected_key_position=3,
+            expected_trail_position=7,
+            expected_fixed_bit_count=2,
+        )
+        self.assertIs(terminal, SolverStatus.ERROR)
+        self.assertEqual(assignments, ((0, 1), (5, 0)))
+        self.assertEqual(count, 17)
 
 
 @unittest.skipUnless(
@@ -107,7 +135,7 @@ class Gift64Stage3AdapterTests(unittest.TestCase):
 class Gift64Stage3IntegrationTests(unittest.TestCase):
     def test_one_deterministic_subcube_count_completes(self) -> None:
         request = Gift64Stage3ProbabilityRequest(
-            "gift64-stage3-probability-request/v1",
+            "gift64-stage3-probability-request/v2",
             "gift64-stage3-integration",
             0,
             0,
@@ -117,6 +145,7 @@ class Gift64Stage3IntegrationTests(unittest.TestCase):
             "cryptominisat",
             "5.14.7",
             30.0,
+            60.0,
         )
         observation = run_gift64_stage3_probability_demo(
             source_path=STAGE3_ROOT / "main.cpp",

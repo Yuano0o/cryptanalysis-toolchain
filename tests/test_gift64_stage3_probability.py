@@ -23,6 +23,7 @@ def valid_request() -> Gift64Stage3ProbabilityRequest:
         solver_name="cryptominisat",
         solver_version="5.14.7",
         per_sample_time_limit_s=30.0,
+        total_time_limit_s=60.0,
     )
 
 
@@ -45,24 +46,41 @@ class Gift64Stage3ProbabilityTests(unittest.TestCase):
         with self.assertRaisesRegex(Gift64Stage3ProbabilityError, "1..63"):
             Gift64Stage3ProbabilityRequest.from_dict(data)
 
-    def test_estimate_is_mean_over_complete_subcube_fractions(self) -> None:
+    def test_estimate_is_mean_with_descriptive_dispersion(self) -> None:
         estimate = estimate_subcube_probability((2, 4), fixed_bit_count=62)
 
         self.assertEqual(estimate.solution_count_total, 6)
         self.assertEqual(estimate.point_estimate, Decimal("0.75"))
-        self.assertIsNotNone(estimate.normal_95_lower)
-        self.assertIsNotNone(estimate.normal_95_upper)
+        self.assertEqual(estimate.sample_fraction_minimum, Decimal("0.5"))
+        self.assertEqual(estimate.sample_fraction_maximum, Decimal("1"))
+        self.assertEqual(estimate.sample_standard_deviation, Decimal("0.35355339059327376220042218105242451964241796884424"))
 
-    def test_one_complete_sample_has_no_descriptive_interval(self) -> None:
+    def test_one_complete_sample_has_no_sample_standard_deviation(self) -> None:
         estimate = estimate_subcube_probability((3,), fixed_bit_count=62)
 
         self.assertEqual(estimate.point_estimate, Decimal("0.75"))
-        self.assertIsNone(estimate.normal_95_lower)
-        self.assertIsNone(estimate.normal_95_upper)
+        self.assertIsNone(estimate.sample_standard_deviation)
+        self.assertEqual(estimate.sample_fraction_minimum, Decimal("0.75"))
+        self.assertEqual(estimate.sample_fraction_maximum, Decimal("0.75"))
+
+    def test_zero_counts_are_descriptive_not_a_zero_width_interval(self) -> None:
+        estimate = estimate_subcube_probability((0, 0), fixed_bit_count=62)
+
+        self.assertEqual(estimate.point_estimate, Decimal("0"))
+        self.assertEqual(estimate.sample_standard_deviation, Decimal("0"))
+        self.assertNotIn("normal_95_lower", estimate.to_dict())
+        self.assertNotIn("normal_95_upper", estimate.to_dict())
 
     def test_impossible_count_is_rejected(self) -> None:
         with self.assertRaisesRegex(Gift64Stage3ProbabilityError, "exceeds"):
             estimate_subcube_probability((5,), fixed_bit_count=62)
+
+    def test_request_rejects_nonfinite_time_limits(self) -> None:
+        data = valid_request().to_dict()
+        data["resources"]["total_time_limit_s"] = float("inf")
+
+        with self.assertRaisesRegex(Gift64Stage3ProbabilityError, "positive"):
+            Gift64Stage3ProbabilityRequest.from_dict(data)
 
 
 if __name__ == "__main__":
