@@ -135,6 +135,49 @@ and verifies that canonical rank does not increase. A contradictory or
 independent LC equation therefore fails the check rather than producing a
 misleading incremental rank.
 
+## Review conclusion and reporting boundary
+
+### What is accepted for A3
+
+The A3 boundary is accepted as an implementation-level reconstruction of the
+*observed output semantics* of the pinned legacy programs.  This conclusion is
+supported by all of the following checks, rather than by a visual comparison of
+printed equations:
+
+- the LC source, LNC source and trail corpus are hash-pinned;
+- the adapter instruments only a temporary copy, at the point where the legacy
+  LNC program has already completed its global elimination;
+- parser and mapping checks reject malformed rows, missing positions, state or
+  RHS columns, duplicate markers, changed source and unexpected stderr;
+- each of the 32 LNC observations has one positional A2 LC base with compatible
+  cipher, field and 128-bit master-key variable-order metadata; and
+- canonical GF(2) affine-space comparison proves that every rank-8 combined
+  space implies its rank-6 LC base, so the reported incremental rank 2 is
+  meaningful.
+
+Accordingly, it is accurate to say that A3 **recovers, normalizes and compares
+the LC and LNC affine key-constraint spaces emitted by the fixed legacy
+implementation**.  It is also accurate to describe the result as a
+demo-ready, reproducible constraint-boundary checkpoint.
+
+### Claims deliberately not made
+
+The following stronger statements must not be inferred from A3 or used in a
+report without a later independent validation stage:
+
+- “the eight printed LNC rows are eight new constraints” — false; they are a
+  basis for the combined LC-plus-linearised space, whose stable additional
+  information has rank 2;
+- “A3 independently reimplements or proves the legacy linearisation” — false;
+  it observes the legacy implementation behind a controlled boundary;
+- “the rank-8 space is the complete exact right-key space” — not established;
+- “the complete Stage 2/teacher pipeline or paper-level differential result has
+  been reproduced” — not established.
+
+For review material, retain the distinction between **program-output semantic
+reproduction** (established here) and **independent cryptanalytic correctness
+or end-to-end key-recovery reproduction** (future work).
+
 ## First bounded fixture
 
 For the first positional trail, the legacy LNC-stage output normalizes to an
