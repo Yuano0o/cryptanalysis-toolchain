@@ -1,140 +1,154 @@
-# Learning-Guided Cryptanalysis
+# Cryptanalysis toolchain
 
-An exploratory research workspace for automated differential analysis and
-learning-guided exact search on lightweight block ciphers.
+Cryptanalysis code published with a paper usually works, and it is worth
+keeping. It just cannot be scripted, checked for regressions, or called from
+anything larger. Each program keeps its parameters as constants in the source,
+so changing one means a rebuild. Each stage writes its output to a file, and
+getting that file to the next stage means copying it by hand. One stage draws
+its random samples from an unrecorded source, so no two runs match.
 
-## Working Proposal
+This project wraps that code instead of rewriting it. Parameters become fields
+in a request file. Stages pass typed messages that carry a version number. Every
+run records the SHA-256 of the program it ran and of the files it read. A
+separate checker re-derives the answer without sharing any code with the part
+that produced it.
 
-SAT-based tools can search for differential or linear characteristics
-automatically, but moving from individual trails to a complete
-differential-level result still involves several separate programs, data files,
-and analysis steps.
+The original stays where it is, unchanged and read-only. A researcher keeps
+working in their own copy and never has to touch this repository. If they change
+it, the recorded hash stops matching and the run fails, instead of quietly
+handing you an answer from a different program. The result is a working GIFT-64
+pipeline: the same programs, run from a script, giving the same answer every
+time.
 
-This repository explores two connected directions: organising those steps into
-a reproducible pipeline, and testing whether machine learning can help
-prioritise the exact search.
+<p align="center">
+  <img src="docs/assets/pipeline-overview.svg" alt="The original C++ programs sit above a hash-checked line and are never edited. Below it, a request with explicit parameters and a seed runs a temporary instrumented copy and returns a typed result carrying its hashes, which a separate checker re-derives." width="100%">
+</p>
 
-### 1. Automated Differential-Level Analysis Pipeline
+**Stack:** Python 3.10+, standard library only · C++ reference programs, read and instrumented · CryptoMiniSat 5.14.7 and a C++ compiler, for the integration tests
 
-The first direction is to connect the main analysis steps into a modular
-workflow:
+## Snapshot
 
-```text
-SAT trail search
-  → trail enumeration and grouping
-  → LC/LNC constraint analysis
-  → fixed-key validation
-  → trail coexistence and right-key-space analysis
-  → probability evaluation
-  → differential construction
-  → result reporting
+| | |
+| --- | ---: |
+| C++ programs wrapped, none edited | 6 (5,723 lines) |
+| Message types between stages | 11 |
+| Tests | 106 |
+| Packages you need to install | 0 |
+| Trail records parsed and normalised | 32 |
+| Python versions tested in CI | 3.10 – 3.13 |
+
+## What changes, and what does not
+
+This project never edits the original programs. A wrapper sits around each one
+and turns what used to be a manual step into something it writes down.
+
+| Before | After |
+| --- | --- |
+| Parameters sit in the source as constants | You fill in fields in a request file |
+| Stages hand files to each other through folders | Stages pass typed messages with a version number |
+| Random samples come from an unrecorded source | You give a seed, and the same request picks the same samples |
+| One key and one trail are fixed in the code | You choose them: 8 keys for a quick run, 1,000 for a full one |
+| A run goes until it ends | Every run has a sample limit and a total limit |
+| It prints a number even when it did not finish | If it did not finish, you get "not started" — not a number |
+| Nothing re-checks the solver's answer | A separate checker re-derives it, sharing no code with the encoder |
+
+See [design notes](docs/design.md) for the full rationale.
+
+## Quick start
+
+The test suite has no third-party dependencies and needs no external tools.
+
+```bash
+git clone https://github.com/Yuano0o/cryptanalysis-toolchain
+cd cryptanalysis-toolchain
+PYTHONPATH=src python3 -m unittest discover -s tests -t .
 ```
 
-GIFT-64 is the first target. The immediate goal is to reproduce a manageable
-part of the published analysis with clear inputs and outputs, configurable
-parameters, independent checks, and regression tests.
-
-### 2. ML-Guided SAT Search
-
-The second direction explores whether machine learning can help the exact
-solver focus on more promising candidates. Possible tasks include:
-
-- partial-trail scoring;
-- candidate ranking;
-- SAT-instance difficulty prediction;
-- branch and search-region prioritisation.
-
-Machine learning is used only for guidance. Every accepted trail, bound, and
-final result must still be verified by an exact SAT solver.
-
-### How the two directions fit together
-
-The automated pipeline is the main framework. ML-guided SAT search is an
-optional acceleration module within it:
-
 ```text
-candidate space
-  → optional ML ranking or prioritisation
-  → exact SAT search and verification
-  → differential-level analysis
-  → verified result
+Ran 106 tests in 0.009s
+OK (skipped=8)
 ```
 
-## Completed Foundation — SAT Baseline B1-B7
+The 8 skipped tests are the ones that compile and run the C++ programs. They need
+the reference sources, a compiler and CryptoMiniSat. When those are missing they
+skip — they do not quietly pass. You can also run any single stage:
 
-The minimal four-round GIFT-64 SAT baseline is complete. It is an
-infrastructure and regression baseline, not a reproduction of the full
-Improved Attacks paper.
-
-| Part | Completed result | Details |
-|---|---|---|
-| B1 | Static variable/clause, DDT, weight, permutation and decoding map | [B1 details](docs/current_analysis/sat_baseline_static_map.md) |
-| B2 | Versioned `SolverRequest` / `SolverResult` contracts | [B2 details](docs/current_analysis/sat_baseline_b2.md) |
-| B3 | Independent GIFT-64 trail and objective verifier | [B3 details](docs/current_analysis/sat_baseline_b3.md) |
-| B4 | CryptoMiniSat 5.14.7 compile and smoke solve | [B4 details](docs/current_analysis/sat_baseline_b4.md) |
-| B5 | Controlled status, decoding and verified SAT result `11 / 1` | [B5 details](docs/current_analysis/sat_baseline_b5.md) |
-| B6 | Stable semantic regression expectation and checker | [B6 details](docs/current_analysis/sat_baseline_b6.md) |
-| B7 | Bounded one-thread/two-thread comparison with preserved semantics | [B7 details](docs/current_analysis/sat_baseline_b7.md) |
-
-See the [SAT baseline index](docs/current_analysis/sat_baseline.md) for scope
-and acceptance criteria. A fresh
-[credibility audit](docs/current_analysis/sat_baseline_audit.md) passed the
-baseline for continued scoped engineering use: it supports a verified
-four-round SAT witness and regression boundary, not optimality, paper-scale
-reproduction or a general performance claim. See
-[project status](docs/current_analysis/project_status.md) for current progress,
-maintenance items, blockers and the next action.
-
-## Current Update — GIFT-64 Pipeline A1-A5
-
-The implemented milestone is a controlled, reviewable GIFT-64
-differential-analysis pipeline demo. A1-A5 expose the supplied artifacts and
-legacy programs through explicit, versioned boundaries:
-
-| Part | Current result | Details |
-|---|---|---|
-| A1 | Strict `TrailInformation.out` parser: 32 physical records over rounds `[5,13)` | [A1 details](docs/current_analysis/gift64_trail_information_a1.md) |
-| A2 | Canonical GF(2) LC spaces: rank 6 for all 32 records | [A2 details](docs/current_analysis/gift64_linear_constraints_a2.md) |
-| A3 | LC plus linearised-relation spaces: rank 8, incremental rank 2, LC implied for all 32 records | [A3 details](docs/current_analysis/gift64_linearized_constraints_a3.md) |
-| A4 | Deterministic generated-key Stage 2 demo with explicit trail position and native per-key statuses | [A4 details](docs/current_analysis/gift64_stage2_a4.md) |
-| A5 | Seeded, budgeted Stage 3 subcube counting with completion-gated descriptive probability output | [A5 details](docs/current_analysis/gift64_stage3_a5.md) |
-| A1-A5 config | Validated smoke/formal manifest binds the shared fixture/trail and referenced A4/A5 requests | [Configuration details](docs/current_analysis/gift64_pipeline_a1_a5_config.md) |
-| A1-A5 runner | One controlled smoke/formal orchestration entry point with separate execution/result states and a generated structured summary | [Runner details](docs/current_analysis/gift64_pipeline_runner_a1_a5.md) |
-
-The smoke runner has completed locally across A1-A5. It is a controlled
-boundary orchestration, not a strict A4-to-A5 artifact data flow or paper
-reproduction; the missing original `KeyCandidate.out`, trail-generation
-provenance and proof-producing `UNSAT` workflow remain material limits.
-
-The component implementation, focused joint review and
-[explicit seven-item acceptance](docs/current_analysis/gift64_pipeline_acceptance_a1_a5.md)
-are complete within the controlled-orchestration claim boundary. **Next step:**
-recover the coexistence-matrix semantics. See
-[project status](docs/current_analysis/project_status.md) for current progress
-and [materials status](docs/current_analysis/materials_status.md) for
-paper-reproduction blockers.
-
-## Planned Evaluation
-
-| Cipher | Role |
-|---|---|
-| GIFT-64 | Primary differential-level analysis case study |
-| BAKSHEESH | Initial benchmark for rebuilding exact search and testing ML guidance |
-| CRAFT / WARP | Later checks of cross-cipher portability |
-
-## Repository Structure
-
-```text
-src/
-├── automated_differential_analysis/
-├── ml_guided_sat/
-└── shared/
-adapters/       interfaces to the upstream reference implementations
-benchmarks/     benchmark definitions and test vectors
-configs/        reproducible configurations
-experiments/    experiment definitions for each evaluation cipher
-tests/          unit, integration, and regression tests
+```console
+$ PYTHONPATH=src python3 scripts/inspect_gift64_linear_constraints.py
+{
+  "adapter_version": "gift64-lc-legacy-adapter/v1",
+  "constraint_set_count": 32,
+  "constraint_set_schema_version": "constraint-set/v1",
+  "equation_count": 192,
+  "legacy_stdout_sha256": "b03a368c3128edf7042f57a9609822be968a324e7163f38c933782c779412a13",
+  "rank_total": 192,
+  "rank_values": [6],
+  "source_sha256": "42f734a6cc7969a55fca5ad498ae319c2676fe4c6e3178ff633efa6295df7bd2",
+  "trail_source_sha256": "fe40ca7b81d4c362d45db58c7c4448317d0305bbd149e04abe12bcede8c02335"
+}
 ```
 
-The public reference repositories remain unchanged and are accessed through
-adapters rather than copied into this repository.
+Three hashes in one result: the program that ran, the output it printed, and the
+input file it read. That is enough to find the exact inputs behind any number
+here.
+
+## What is checked, and what is not
+
+| Checked | How |
+| --- | --- |
+| A four-round GIFT-64 SAT result | decoded and re-derived by a separate checker |
+| 32 trail records | turned into rank-6 GF(2) spaces, then rank-8, with every original basis still implied |
+| Every stage run | same seed, capped budget, hashes recorded |
+| The whole pipeline | seven written acceptance criteria, checked by review, by a real test run, and by its own output |
+| The SAT baseline | audited separately, and passed for the uses listed there |
+
+This project does not claim that any trail or bound is optimal, that it
+reproduces the published paper-scale results, that it makes the solver faster,
+or that machine learning contributes anything to the numbers above.
+
+## Status
+
+| Area | Status |
+| --- | --- |
+| SAT baseline | complete |
+| GIFT-64 pipeline, stages 1–5 | complete |
+| Trail coexistence, 18/19-round construction | blocked — generator artifacts absent upstream |
+| ML-guided candidate ranking | blocked — prior-work source and data unavailable |
+| CRAFT / WARP portability | deferred |
+
+Every document uses the same fixed set of status words, so "finished", "usable"
+and "stuck" never blur into each other.
+
+## Repository structure
+
+```text
+.
+├── src/
+│   ├── automated_differential_analysis/   stages, formats, legacy adapters
+│   ├── ml_guided_sat/                     optional learned guidance
+│   └── shared/                            SAT contracts, GF(2) constraints, ciphers
+├── adapters/        interfaces to the upstream reference implementations
+├── benchmarks/      benchmark definitions and test vectors
+├── configs/         reproducible configurations
+├── docs/            design notes, per-stage analysis, project status
+├── experiments/     experiment manifests per cipher
+├── scripts/         inspection and demo entry points
+└── tests/           unit, integration, and regression tests
+```
+
+The reference programs are never copied into this repository. Generated output,
+solver logs and binaries are kept out of Git.
+
+## Documentation
+
+- [Design notes](docs/design.md) — the boundary, contracts, determinism, verification
+- [References](docs/references.md) — papers and reference implementations this builds on
+- [Project status](docs/current_analysis/project_status.md) — progress, next actions, blockers
+- [SAT baseline](docs/current_analysis/sat_baseline.md) — scope and acceptance criteria
+- [Credibility audit](docs/current_analysis/sat_baseline_audit.md) — what the baseline supports
+- [Pipeline acceptance](docs/current_analysis/gift64_pipeline_acceptance_a1_a5.md) — the seven criteria
+- [Engineering rules](docs/ENGINEERING_RULES.md) — working rules this repository follows
+
+## License
+
+Released under the [MIT License](LICENSE).
