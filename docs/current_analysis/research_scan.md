@@ -27,7 +27,7 @@ in the research map because it has a clear conceptual role, but no claims about
 its entry points, modules, inputs, outputs, dependencies, or completeness are
 made.
 
-### Eight locally reviewed papers
+### Nine locally available papers
 
 1. *Accelerating the Search of Differential and Linear Characteristics with the
    SAT Method*
@@ -40,11 +40,14 @@ made.
 6. *NeuroGIFT: Using a Machine Learning Based SAT Solver for Cryptanalysis*
 7. *Learning a SAT Solver from Single-Bit Supervision* (NeuroSAT)
 8. *Improved Attacks on GIFT-64*
+9. *Key-Recovery Attacks on CRAFT and WARP*
 
 The CRAFT/WARP supplementary README identifies the associated main paper as
-*Key-Recovery Attacks on CRAFT and WARP*. That main paper is not present
-locally, so the repository assessment below is limited to its README, pattern
-PDFs, source ZIP inventories, and staged source code.
+*Key-Recovery Attacks on CRAFT and WARP*. The full-version paper is now
+available at `../papers/04_cipher-extensions/15_key_recovery_attacks_craft_warp.pdf`.
+The repository assessment below still distinguishes the paper from the
+supplementary README, pattern PDFs, source ZIP inventories, and staged source
+code.
 
 ## 2. Overall relationship
 
@@ -245,7 +248,7 @@ out-of-distribution line-B test.
 | Outputs | `MemoriseRightPair.out`, repeated `MemoriseKeyCandidate.out` files and stdout candidate/runtime summaries |
 | Dependencies | Standard C++ and shell tools; the staged C++ does not invoke a SAT solver |
 | Nondeterminism/concurrency | Step 0 uses `srand(time(0))`; CRAFT Step 5 launches 16 background cases through `SetUpTest.sh` |
-| Missing content | Main paper PDF, formal stage graph, build/run documentation, expected results/runtimes, complete candidate provenance, deterministic controls and small fixtures |
+| Missing content | Formal stage graph, build/run documentation, expected outputs/runtimes, complete candidate provenance, deterministic controls and small fixtures |
 
 This repository is key-recovery supplementary material, not a second copy of
 the GIFT differential pipeline. It should be introduced only after general
@@ -548,15 +551,15 @@ stable.
 ### For line A
 
 1. `../upstream/Supplementary_Material_GIFT-64_Differential/Source_code/README.md`
-2. `../papers/gift64-differential/01_deeper_look_related_key_differentials_gift64.pdf`,
+2. `../papers/01_gift-pipeline/01_deeper_look_related_key_differentials_gift64.pdf`,
    Sections 2-4
-3. `../papers/gift64-differential/02_linearisation_method_differential_dependencies.pdf`,
+3. `../papers/01_gift-pipeline/03_linearisation_method_differential_dependencies.pdf`,
    Sections 4-6
 4. the six GIFT `Source_code/*/main.cpp` files in order
 5. `../upstream/Accelerating_Automatic_Search/ReadMe.pdf`
 6. the Accelerating paper's SAT encoding and Matsui-bound sections
 7. `../upstream/Accelerating_Automatic_Search/1.Source-Code/1.PRESENT/1.Differential-Active-Sbox/SearchWithCadical.py`
-8. `../papers/gift64-improved-attacks/01_improved_attacks_gift64.pdf`,
+8. `../papers/01_gift-pipeline/07_12_19_improved_attacks_gift64.pdf`,
    especially Sections 2.2, 3.1 and 4.1
 9. `../upstream/_archives/Improved_Attacks_GIFT64-main.zip` members `Differential.cpp` and
    `Linear.cpp`
@@ -568,7 +571,7 @@ cases only. They are insufficient for a complete paper/attack regression.
 
 1. the same small PRESENT `SearchWithCadical.py`
 2. `../upstream/Supplementary_Material_BAKSHEESH/main.cpp`
-3. `../papers/baksheesh/01_optimal_linear_characteristics_baksheesh.pdf`,
+3. `../papers/04_cipher-extensions/05_optimal_linear_characteristics_baksheesh.pdf`,
    especially the representation section and structural/counting results
 4. the NeuroSAT architecture section
 5. the NeuroGIFT dataset construction, controlled-negative and limitations

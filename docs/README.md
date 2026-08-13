@@ -1,7 +1,7 @@
 # Local Research Control
 
-> `current_analysis/` and this index are project documentation. The restored
-> `prior_planning/` set is intentionally ignored by Git and retained only as a
+> `current_analysis/` and this index are project documentation. The local
+> `planning/` set is intentionally ignored by Git and retained only as a
 > local historical reference.
 
 ## Document groups
@@ -13,8 +13,6 @@ These files reflect the latest full workspace and paper scan:
 - [research_scan.md](current_analysis/research_scan.md): evidence-backed scan
   of repositories, papers, source relationships, schemas and compute
   environments.
-- [materials_status.md](current_analysis/materials_status.md): materials and
-  dependencies needed by each workstream, what is present, and what is missing.
 - [project_status.md](current_analysis/project_status.md): current status,
   blockers and next milestone for the overall project and every component.
 - [sat_baseline.md](current_analysis/sat_baseline.md): scope, inputs,
@@ -68,7 +66,7 @@ These files reflect the latest full workspace and paper scan:
   explicit seven-item joint acceptance, executed evidence, decision boundary
   and the resolved acceptance-evidence finding.
 
-### Prior planning
+### Planning
 
 These eight files are restored unchanged from the planning set that existed
 before commit `49fd340`:
@@ -89,23 +87,20 @@ before commit `49fd340`:
    progress link and the next step.
 2. Put implementation evidence, methodology, commands, limitations and
    detailed results in a dedicated `current_analysis/<part>.md` file.
-3. Update `current_analysis/materials_status.md` when a paper, archive, dataset,
-   solver, expected output or external code source is added or confirmed
-   unavailable.
-4. Update `current_analysis/project_status.md` after a milestone changes state
+3. Update `current_analysis/project_status.md` after a milestone changes state
    or a blocker is added/removed.
-5. Update the relevant part index, such as
+4. Update the relevant part index, such as
    `current_analysis/sat_baseline.md`, after each checkpoint, including static
    review, configuration, execution, independent validation and regression
    capture.
-6. End each completed part by updating the recorded next step and linking both
+5. End each completed part by updating the recorded next step and linking both
    its detail file and `project_status.md` from the root README.
-7. Keep generated CNF, solver logs, binaries, datasets and model outputs out of
+6. Keep generated CNF, solver logs, binaries, datasets and model outputs out of
    this directory and out of Git.
-8. Record evidence and paths. Do not mark a result reproduced until the exact
+7. Record evidence and paths. Do not mark a result reproduced until the exact
    configuration and independent validation are both available.
-9. Treat `prior_planning/` as a preserved reference set. Reconcile differences
+8. Treat `planning/` as a preserved reference set. Reconcile differences
    explicitly instead of silently merging it into the current analysis.
-10. Keep review conclusions in a durable audit file with dated evidence and
+9. Keep review conclusions in a durable audit file with dated evidence and
     stable follow-up IDs. Update the root summary only when the audit decision
     or project next step changes.

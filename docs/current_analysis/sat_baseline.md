@@ -78,7 +78,7 @@ workspace.
 
 ## Planned research-side artifacts
 
-These are authored in `learning-guided-cryptanalysis/`, not upstream:
+These are authored in this repository, not upstream:
 
 1. a versioned baseline configuration;
 2. a static source/variable map;

@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-26
+> Last updated: 2026-07-27
 >
 > Status vocabulary: `complete`, `complete-draft`, `in-progress`, `ready`,
 > `ready-for-static-work`, `blocked`, `not-started`, `deferred`.
@@ -9,14 +9,14 @@
 
 | Item | Status | Evidence/meaning |
 |---|---|---|
-| Source and paper inventory | complete | Four upstream repositories, one additional source archive and eight papers inspected |
+| Source and paper inventory | complete | Four upstream repositories, one additional source archive and nine papers inventoried |
 | Research structure | complete | Two workstreams distinguished from shared enabling milestones |
 | Stage-contract schema design | in-progress | Solver, trail, TrailInformation, GF(2) `ConstraintSet`, space comparison, Stage 2 key corpus and bounded Stage 3 probability contracts are implemented; right-key contracts remain |
 | SAT baseline | complete | B0-B7 pass; the 2026-07-26 credibility audit passed with scoped maintenance follow-ups |
 | Workstream A pipeline implementation | in-progress | Controlled A1-A5 milestone passed its explicit seven-item acceptance; coexistence and later stages remain |
 | Workstream B exact benchmark | not-started | BAKSHEESH source/paper inspected; search code missing |
 | ML-guided SAT implementation | blocked | Exact label pipeline and NeuroGIFT source/data are unavailable |
-| CRAFT/WARP portability | deferred | Main paper/provenance missing; interfaces not stable |
+| CRAFT/WARP portability | deferred | Main paper is available; candidate provenance is incomplete and interfaces are not stable |
 
 ## Completed milestone
 
@@ -72,7 +72,7 @@ Completed checkpoints:
 
 | Component | Status | Current result | Next step | Blocker |
 |---|---|---|---|---|
-| CRAFT/WARP source inventory | complete | Step0-Step7 and candidate files inspected | Obtain main paper | Main paper missing |
+| CRAFT/WARP source inventory | complete | Step0-Step7 and candidate files inspected; full-version main paper identified and available | Map paper sections to stages after GIFT interfaces stabilise | Candidate provenance and formal stage mapping remain incomplete |
 | Adapter design | deferred | Required key/tweak/candidate abstractions identified | Revisit after GIFT interfaces stabilise | Premature |
 | Cross-cipher ML evaluation | deferred | OOD role identified | Revisit after ML baseline | No model/dataset |
 
@@ -181,3 +181,4 @@ The authoritative details and completion evidence are in
   regression passed all seven requirements, the CLI emitted a complete
   parseable observation, and the durable acceptance audit records the scoped
   pass and exclusions.
+- 2026-07-26: closed the A1-A5 MVP as a completed root-README update.

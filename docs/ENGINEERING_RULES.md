@@ -1,9 +1,8 @@
-# Agent Instructions
+# Engineering Rules
 
 ## Scope
 
-- Make all new code changes inside this `learning-guided-cryptanalysis/`
-  repository.
+- Make all new code changes inside this repository.
 - Treat every repository under `../upstream/` as read-only reference code.
 - Do not refactor, format, patch, commit, or change remotes in `../upstream/`
   unless the user explicitly requests a specific upstream change.

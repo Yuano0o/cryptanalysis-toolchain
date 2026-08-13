@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cryptanalysis-toolchain"
+version = "0.1.0"
+description = "Reproducible differential-analysis pipeline for lightweight block ciphers, with exact SAT verification"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Yuxuan Peng" }]
+keywords = ["cryptanalysis", "SAT", "differential-cryptanalysis", "reproducibility", "GIFT-64"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Security :: Cryptography",
+  "Topic :: Scientific/Engineering",
+]
+# No third-party runtime dependencies: the pipeline and its tests use the
+# Python standard library only. External tools (a C++ compiler and
+# CryptoMiniSat) are needed solely for the integration tests, which skip
+# themselves when those tools are absent.
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
